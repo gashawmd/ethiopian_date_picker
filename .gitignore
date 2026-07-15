@@ -5,4 +5,4 @@ pubspec.lock
 *.iml
 .idea/
 .vscode/
-coverage/
+coverage/analyze_output.txt
