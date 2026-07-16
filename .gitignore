@@ -6,3 +6,6 @@ pubspec.lock
 .idea/
 .vscode/
 coverage/analyze_output.txt
+coverage/
+test_output.log
+test_results.json
