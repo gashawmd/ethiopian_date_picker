@@ -1,112 +1,107 @@
-import 'calendar_logic.dart';
-import 'converter.dart';
+import 'jdn_converter.dart';
 
-/// An immutable representation of a date on the Ethiopian (Ge'ez) calendar.
-///
-/// Month is 1-13 (13 = Pagumē, the short 13th month). Day is 1-30 for
-/// months 1-12, and 1-5 (or 1-6 in a leap year) for month 13.
 class EthiopianDate implements Comparable<EthiopianDate> {
-  /// Creates an Ethiopian date. Throws [ArgumentError] if the
-  /// year/month/day combination is not a valid Ethiopian calendar date.
-  EthiopianDate(this.year, this.month, this.day) {
-    if (!EthiopianCalendarLogic.isValidDate(year, month, day)) {
-      throw ArgumentError(
-        'Invalid Ethiopian date: $year-$month-$day. '
-        'Month must be 1-13 and day must fit within that month '
-        '(Pagume has ${EthiopianCalendarLogic.isLeapYear(year) ? 6 : 5} '
-        'days for year $year).',
-      );
-    }
+  factory EthiopianDate(int year, int month, int day) {
+    _validate(year, month, day);
+    return EthiopianDate._(year, month, day);
   }
 
-  /// Internal constructor that skips validation, used only for values we
-  /// already know are correct (e.g. derived from JDN math).
-  const EthiopianDate._unchecked(this.year, this.month, this.day);
+  const EthiopianDate._(this.year, this.month, this.day);
+
+  factory EthiopianDate.fromGregorian(DateTime dateTime) {
+    final int jdn = JdnConverter.gregorianToJdn(
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+    );
+    final YMD ymd = JdnConverter.jdnToEthiopian(jdn);
+    return EthiopianDate._(ymd.year, ymd.month, ymd.day);
+  }
+
+  factory EthiopianDate.today() => EthiopianDate.fromGregorian(DateTime.now());
+
+  factory EthiopianDate.fromJson(Map<String, dynamic> json) {
+    final Object? y = json['year'];
+    final Object? m = json['month'];
+    final Object? d = json['day'];
+    if (y is! int || m is! int || d is! int) {
+      throw InvalidCalendarDateException(
+        'EthiopianDate.fromJson expects int "year", "month", "day" keys, '
+        'got $json.',
+      );
+    }
+    return EthiopianDate(y, m, d);
+  }
 
   final int year;
   final int month;
   final int day;
 
-  /// Builds an [EthiopianDate] from a Gregorian [DateTime].
-  factory EthiopianDate.fromGregorian(DateTime dateTime) {
-    final int jdn = gregorianToJdn(
-      dateTime.year,
-      dateTime.month,
-      dateTime.day,
-    );
-    final result = jdnToEthiopian(jdn);
-    return EthiopianDate._unchecked(result.year, result.month, result.day);
-  }
-
-  /// Returns today's date, converted to the Ethiopian calendar.
-  factory EthiopianDate.today() => EthiopianDate.fromGregorian(DateTime.now());
-
-  /// Converts this Ethiopian date to the equivalent Gregorian [DateTime].
-  DateTime toGregorian() {
-    final int jdn = ethiopianToJdn(year, month, day);
-    final result = jdnToGregorian(jdn);
-    return DateTime(result.year, result.month, result.day);
-  }
-
-  /// Number of days in this date's month.
-  int get daysInMonth => EthiopianCalendarLogic.daysInMonth(year, month);
-
-  /// True if this date falls in an Ethiopian leap year (Pagume has 6 days).
-  bool get isLeapYear => EthiopianCalendarLogic.isLeapYear(year);
-
-  /// Day of week: 0 = Monday .. 6 = Sunday.
-  int get weekday => EthiopianCalendarLogic.weekdayOf(year, month, day);
-
-  /// Returns a copy of this date with the given fields replaced.
-  EthiopianDate copyWith({int? year, int? month, int? day}) {
-    return EthiopianDate(year ?? this.year, month ?? this.month, day ?? this.day);
-  }
-
-  /// Returns a new date representing the first day of this date's month.
-  EthiopianDate get firstDayOfMonth => EthiopianDate._unchecked(year, month, 1);
-
-  /// Returns a new date advanced or rewound by [months] months, clamping
-  /// the day if the target month is shorter (e.g. moving into Pagume).
-  EthiopianDate addMonths(int months) {
-    final int totalMonths = (year * 13) + (month - 1) + months;
-    final int newYear = totalMonths ~/ 13;
-    int newMonth = totalMonths % 13;
-    if (newMonth < 0) {
-      newMonth += 13;
+  static void _validate(int year, int month, int day) {
+    if (month < 1 || month > 13) {
+      throw InvalidCalendarDateException(
+        'Ethiopian month must be between 1 and 13, got $month.',
+      );
     }
-    newMonth += 1;
-    final int maxDay = EthiopianCalendarLogic.daysInMonth(newYear, newMonth);
-    final int newDay = day > maxDay ? maxDay : day;
-    return EthiopianDate._unchecked(newYear, newMonth, newDay);
+    final int maxDay = JdnConverter.daysInEthiopianMonth(year, month);
+    if (day < 1 || day > maxDay) {
+      throw InvalidCalendarDateException(
+        'Ethiopian day must be between 1 and $maxDay for '
+        '$year-$month, got $day.',
+      );
+    }
   }
 
+  static bool isLeapYear(int year) => JdnConverter.isEthiopianLeapYear(year);
+  DateTime toGregorian() {
+    final int jdn = JdnConverter.ethiopianToJdn(year, month, day);
+    final YMD ymd = JdnConverter.jdnToGregorian(jdn);
+    return DateTime(ymd.year, ymd.month, ymd.day);
+  }
+
+  Map<String, int> toJson() => {'year': year, 'month': month, 'day': day};
+
+  int get julianDayNumber => JdnConverter.ethiopianToJdn(year, month, day);
+
+  EthiopianDate copyWith({int? year, int? month, int? day}) {
+    return EthiopianDate(
+        year ?? this.year, month ?? this.month, day ?? this.day);
+  }
+
+  @override
+  int compareTo(EthiopianDate other) =>
+      julianDayNumber.compareTo(other.julianDayNumber);
+
+  /// True if this date is strictly before [other].
   bool isBefore(EthiopianDate other) => compareTo(other) < 0;
+
+  /// True if this date is strictly after [other].
   bool isAfter(EthiopianDate other) => compareTo(other) > 0;
+
+  /// True if this date represents the same day as [other]. Equivalent to
+  /// `==` for [EthiopianDate], provided for symmetry with `DateTime`'s API.
   bool isAtSameMomentAs(EthiopianDate other) => compareTo(other) == 0;
 
   @override
-  int compareTo(EthiopianDate other) {
-    return ethiopianToJdn(
-      year,
-      month,
-      day,
-    ).compareTo(ethiopianToJdn(other.year, other.month, other.day));
-  }
-
-  @override
-  bool operator ==(Object other) {
-    return other is EthiopianDate &&
-        other.year == year &&
-        other.month == month &&
-        other.day == day;
-  }
+  bool operator ==(Object other) =>
+      other is EthiopianDate &&
+      other.year == year &&
+      other.month == month &&
+      other.day == day;
 
   @override
   int get hashCode => Object.hash(year, month, day);
 
+  bool operator <(EthiopianDate other) => compareTo(other) < 0;
+
+  bool operator <=(EthiopianDate other) => compareTo(other) <= 0;
+
+  bool operator >(EthiopianDate other) => compareTo(other) > 0;
+
+  bool operator >=(EthiopianDate other) => compareTo(other) >= 0;
+
   @override
-  String toString() {
-    final monthName = EthiopianCalendarLogic.monthNamesEn[month];
-    return '$monthName $day, $year';
-  }
+  String toString() => '${year.toString().padLeft(4, '0')}-'
+      '${month.toString().padLeft(2, '0')}-'
+      '${day.toString().padLeft(2, '0')}';
 }

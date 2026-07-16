@@ -1,10 +1,11 @@
+/// Ethiopian (Ge'ez) calendar support for Dart & Flutter: an immutable
+/// date model, exact Gregorian conversion, date arithmetic, and (in later
+/// phases) a Material date picker widget.
 library ethiopian_date_picker;
 
-export 'core/calendar_logic.dart';
 export 'core/ethiopian_date.dart';
-export 'core/ethiopian_date_range.dart';
-export 'localization/ethiopian_locale.dart';
-export 'theme/picker_theme.dart';
-export 'ui/calendar_view.dart';
-export 'ui/date_picker_dialog.dart';
+export 'core/ethiopian_date_arithmetic.dart';
+export 'core/ethiopian_date_interop.dart';
+export 'core/jdn_converter.dart'
+    show InvalidCalendarDateException; // YMD is an internal detail
 export 'utils/date_utils.dart';
