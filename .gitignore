@@ -5,7 +5,11 @@ pubspec.lock
 *.iml
 .idea/
 .vscode/
-coverage/analyze_output.txt
 coverage/
 test_output.log
 test_results.json
+analyze_output.txt
+analyze_output.json
+dialog_test_results.json
+error_handling_results.json
+widget_test_results.json

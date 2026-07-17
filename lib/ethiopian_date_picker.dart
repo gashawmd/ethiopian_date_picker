@@ -9,3 +9,6 @@ export 'core/ethiopian_date_interop.dart';
 export 'core/jdn_converter.dart'
     show InvalidCalendarDateException; // YMD is an internal detail
 export 'utils/date_utils.dart';
+export 'ui/calendar_view.dart';
+export 'ui/day_cell.dart';
+export 'ui/header.dart';
