@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/ethiopian_date.dart';
+import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'day_cell.dart';
 import 'header.dart';
@@ -17,6 +18,12 @@ import 'header.dart';
 /// how much space its parent offers - without this, an unconstrained
 /// parent causes the grid to stretch to fill available width, producing
 /// oversized cells and vertical overflow.
+///
+/// Resolves [theme] once via [EthiopianDatePickerTheme.material3] when
+/// omitted, then passes that single resolved instance down to every
+/// child cell and the header, so the whole grid stays visually
+/// consistent even though each child could theoretically resolve its
+/// own default independently.
 class EthiopianCalendarView extends StatelessWidget {
   const EthiopianCalendarView({
     super.key,
@@ -27,6 +34,7 @@ class EthiopianCalendarView extends StatelessWidget {
     required this.onMonthChanged,
     this.selectedDate,
     this.locale,
+    this.theme,
   });
 
   /// Any date within the month currently being displayed. Only its
@@ -54,16 +62,29 @@ class EthiopianCalendarView extends StatelessWidget {
   /// [EthiopianCalendarHeader.resolveLocale] for fallback behavior.
   final String? locale;
 
+  /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when omitted.
+  final EthiopianDatePickerTheme? theme;
+
   /// Fixed width for the whole widget, matching Material's own date
   /// picker footprint. 7 columns at ~46px each plus minor padding.
   static const double _width = 328;
 
   static const List<String> _weekdayLabels = [
-    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+    'Mon',
+    'Tue',
+    'Wed',
+    'Thu',
+    'Fri',
+    'Sat',
+    'Sun',
   ];
 
   @override
   Widget build(BuildContext context) {
+    final EthiopianDatePickerTheme resolvedTheme =
+        theme ?? EthiopianDatePickerTheme.material3(context);
+
     final int year = displayedMonth.year;
     final int month = displayedMonth.month;
     final int daysInMonth = EthiopianDateUtils.daysInMonth(year, month);
@@ -79,8 +100,9 @@ class EthiopianCalendarView extends StatelessWidget {
       EthiopianDateUtils.daysInMonth(previousMonth.year, previousMonth.month),
     );
 
-    return SizedBox(
+    return Container(
       width: _width,
+      color: resolvedTheme.backgroundColor,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -88,12 +110,13 @@ class EthiopianCalendarView extends StatelessWidget {
             year: year,
             month: month,
             locale: locale,
+            theme: resolvedTheme,
             onPreviousMonth: () => onMonthChanged(previousMonth),
             onNextMonth: () => onMonthChanged(nextMonth),
             canGoPrevious: !previousMonthLastDay.isBefore(firstDate),
             canGoNext: !nextMonth.isAfter(lastDate),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: resolvedTheme.spacing.sm),
           Row(
             children: _weekdayLabels
                 .map(
@@ -101,20 +124,14 @@ class EthiopianCalendarView extends StatelessWidget {
                     child: Center(
                       child: Text(
                         label,
-                        style:
-                            Theme.of(context).textTheme.labelSmall?.copyWith(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        style: resolvedTheme.typography.weekdayLabelStyle,
                       ),
                     ),
                   ),
                 )
                 .toList(),
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: resolvedTheme.spacing.xs),
           GridView.count(
             crossAxisCount: 7,
             shrinkWrap: true,
@@ -123,7 +140,7 @@ class EthiopianCalendarView extends StatelessWidget {
             children: [
               for (int i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
               for (int day = 1; day <= daysInMonth; day++)
-                _buildDayCell(year, month, day, today),
+                _buildDayCell(year, month, day, today, resolvedTheme),
             ],
           ),
         ],
@@ -131,7 +148,13 @@ class EthiopianCalendarView extends StatelessWidget {
     );
   }
 
-  Widget _buildDayCell(int year, int month, int day, EthiopianDate today) {
+  Widget _buildDayCell(
+    int year,
+    int month,
+    int day,
+    EthiopianDate today,
+    EthiopianDatePickerTheme resolvedTheme,
+  ) {
     final EthiopianDate date = EthiopianDate(year, month, day);
     final bool isDisabled = date.isBefore(firstDate) || date.isAfter(lastDate);
     final bool isSelected = selectedDate != null && date == selectedDate;
@@ -142,6 +165,7 @@ class EthiopianCalendarView extends StatelessWidget {
       isSelected: isSelected,
       isToday: isToday,
       isDisabled: isDisabled,
+      theme: resolvedTheme,
       onTap: isDisabled ? null : () => onDateSelected(date),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/ethiopian_date.dart';
+import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
 
@@ -19,6 +20,9 @@ import 'calendar_view.dart';
 /// final date = await showEthiopianDatePicker(context: context);
 /// ```
 ///
+/// Pass [theme] to override colors, spacing, or typography; omit it
+/// and the picker matches the ambient Material 3 app theme.
+///
 /// Error handling (see [EthiopianDatePickerDialog] for details):
 /// - `initialDate` outside `[firstDate, lastDate]` is silently clamped
 ///   into range rather than throwing or producing an unselectable
@@ -33,6 +37,7 @@ Future<EthiopianDate?> showEthiopianDatePicker({
   EthiopianDate? firstDate,
   EthiopianDate? lastDate,
   String? locale,
+  EthiopianDatePickerTheme? theme,
 }) {
   final EthiopianDate resolvedInitialDate =
       initialDate ?? EthiopianDate.today();
@@ -48,6 +53,7 @@ Future<EthiopianDate?> showEthiopianDatePicker({
       firstDate: resolvedFirstDate,
       lastDate: resolvedLastDate,
       locale: locale,
+      theme: theme,
     ),
   );
 }
@@ -75,6 +81,7 @@ class EthiopianDatePickerDialog extends StatefulWidget {
     required this.firstDate,
     required this.lastDate,
     this.locale,
+    this.theme,
   }) : assert(
           !firstDate.isAfter(lastDate),
           'EthiopianDatePickerDialog: firstDate ($firstDate) must not be '
@@ -89,6 +96,10 @@ class EthiopianDatePickerDialog extends StatefulWidget {
   /// [EthiopianCalendarHeader.resolveLocale] for fallback behavior -
   /// an unrecognized code never throws, it just falls back to English.
   final String? locale;
+
+  /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when omitted.
+  final EthiopianDatePickerTheme? theme;
 
   @override
   State<EthiopianDatePickerDialog> createState() =>
@@ -133,9 +144,13 @@ class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final EthiopianDatePickerTheme resolvedTheme =
+        widget.theme ?? EthiopianDatePickerTheme.material3(context);
+
     return Dialog(
+      backgroundColor: resolvedTheme.backgroundColor,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(resolvedTheme.spacing.md),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -145,20 +160,27 @@ class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
               lastDate: widget.lastDate,
               selectedDate: _selectedDate,
               locale: widget.locale,
+              theme: resolvedTheme,
               onDateSelected: _handleDateSelected,
               onMonthChanged: _handleMonthChanged,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: resolvedTheme.spacing.sm),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
                   onPressed: _handleCancel,
+                  style: TextButton.styleFrom(
+                    foregroundColor: resolvedTheme.primaryColor,
+                  ),
                   child: const Text('CANCEL'),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: resolvedTheme.spacing.sm),
                 TextButton(
                   onPressed: _handleOk,
+                  style: TextButton.styleFrom(
+                    foregroundColor: resolvedTheme.primaryColor,
+                  ),
                   child: const Text('OK'),
                 ),
               ],

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../theme/picker_theme.dart';
+
 /// Month/year label with previous/next navigation arrows, styled to
-/// match Material's built-in date picker header.
+/// match Material's built-in date picker header. Colors and text style
+/// come from [theme]; omit it to fall back to
+/// [EthiopianDatePickerTheme.material3].
 class EthiopianCalendarHeader extends StatelessWidget {
   const EthiopianCalendarHeader({
     super.key,
@@ -12,6 +16,7 @@ class EthiopianCalendarHeader extends StatelessWidget {
     this.canGoPrevious = true,
     this.canGoNext = true,
     this.locale,
+    this.theme,
   });
 
   final int year;
@@ -28,6 +33,10 @@ class EthiopianCalendarHeader extends StatelessWidget {
   /// phase; this parameter exists now so callers can already pass a
   /// locale without it becoming a breaking API change later.
   final String? locale;
+
+  /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when omitted.
+  final EthiopianDatePickerTheme? theme;
 
   /// Locale codes with real month-name data today. Kept as a set (not
   /// just "is it 'en'") so adding a second locale later is a one-line
@@ -61,11 +70,14 @@ class EthiopianCalendarHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final EthiopianDatePickerTheme resolvedTheme =
+        theme ?? EthiopianDatePickerTheme.material3(context);
+
     // resolveLocale() never throws, regardless of what's passed in -
     // this is what makes an invalid/missing locale a non-issue rather
     // than a crash.
-    final String resolved = resolveLocale(locale);
-    final String monthName = switch (resolved) {
+    final String resolvedLocale = resolveLocale(locale);
+    final String monthName = switch (resolvedLocale) {
       'en' => _monthNamesEn[month - 1],
       _ => _monthNamesEn[month - 1], // only English exists today
     };
@@ -75,17 +87,26 @@ class EthiopianCalendarHeader extends StatelessWidget {
       children: [
         IconButton(
           icon: const Icon(Icons.chevron_left),
+          color: resolvedTheme.primaryColor,
           onPressed: canGoPrevious ? onPreviousMonth : null,
           tooltip: 'Previous month',
         ),
-        Text(
-          '$monthName $year',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+        // Expanded + ellipsis/scaling means an unusually large custom
+        // headerStyle (or a long localized month name in a future
+        // locale) shrinks or truncates gracefully instead of
+        // overflowing the fixed-width header row.
+        Expanded(
+          child: Text(
+            '$monthName $year',
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: resolvedTheme.typography.headerStyle,
+          ),
         ),
         IconButton(
           icon: const Icon(Icons.chevron_right),
+          color: resolvedTheme.primaryColor,
           onPressed: canGoNext ? onNextMonth : null,
           tooltip: 'Next month',
         ),

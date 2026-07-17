@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import '../theme/picker_theme.dart';
+
 /// A single day cell within the Ethiopian calendar grid.
 ///
 /// Mirrors Material's own date picker day styling: a filled circle for
 /// the selected day, an outlined circle for today, and dimmed,
-/// non-interactive text for out-of-range days.
+/// non-interactive text for out-of-range days. All colors and text
+/// styles come from [theme]; pass one explicitly to override the
+/// default look, or omit it to fall back to
+/// [EthiopianDatePickerTheme.material3].
 class EthiopianDayCell extends StatelessWidget {
   const EthiopianDayCell({
     super.key,
@@ -13,6 +18,7 @@ class EthiopianDayCell extends StatelessWidget {
     required this.isToday,
     required this.isDisabled,
     required this.onTap,
+    this.theme,
   });
 
   final int day;
@@ -24,28 +30,34 @@ class EthiopianDayCell extends StatelessWidget {
   /// taps, so there's exactly one source of truth for "is this tappable".
   final VoidCallback? onTap;
 
+  /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when omitted.
+  final EthiopianDatePickerTheme? theme;
+
   @override
   Widget build(BuildContext context) {
-    final ColorScheme colors = Theme.of(context).colorScheme;
+    final EthiopianDatePickerTheme resolvedTheme =
+        theme ?? EthiopianDatePickerTheme.material3(context);
 
     Color backgroundColor = Colors.transparent;
-    Color textColor = colors.onSurface;
+    Color textColor = resolvedTheme.typography.dayStyle.color ??
+        Theme.of(context).colorScheme.onSurface;
     Border? border;
 
     if (isSelected) {
-      backgroundColor = colors.primary;
-      textColor = colors.onPrimary;
+      backgroundColor = resolvedTheme.selectedColor;
+      textColor = resolvedTheme.onSelectedColor;
     } else if (isToday) {
-      border = Border.all(color: colors.primary, width: 1.5);
-      textColor = colors.primary;
+      border = Border.all(color: resolvedTheme.todayBorderColor, width: 1.5);
+      textColor = resolvedTheme.primaryColor;
     }
 
     if (isDisabled) {
-      textColor = colors.onSurface.withValues(alpha: 0.38);
+      textColor = resolvedTheme.disabledColor;
     }
 
     return Padding(
-      padding: const EdgeInsets.all(2),
+      padding: EdgeInsets.all(resolvedTheme.spacing.xs / 2),
       child: Material(
         color: Colors.transparent,
         shape: const CircleBorder(),
@@ -61,7 +73,7 @@ class EthiopianDayCell extends StatelessWidget {
             alignment: Alignment.center,
             child: Text(
               '$day',
-              style: TextStyle(
+              style: resolvedTheme.typography.dayStyle.copyWith(
                 color: textColor,
                 fontWeight:
                     isSelected || isToday ? FontWeight.w600 : FontWeight.normal,
