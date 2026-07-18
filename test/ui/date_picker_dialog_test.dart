@@ -190,7 +190,12 @@ void main() {
       expect(find.text('Meskerem 2016'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Next month'));
-      await tester.pump();
+      // pumpAndSettle (not a single pump()) because Task 4.1 added a
+      // real slide/fade transition on month change - a bare pump()
+      // would catch the grid mid-transition, where both the outgoing
+      // and incoming month's day cells briefly coexist in the tree,
+      // making find.text('3') below ambiguous.
+      await tester.pumpAndSettle();
 
       expect(find.text('Tikimt 2016'), findsOneWidget);
 

@@ -23,6 +23,13 @@ import 'calendar_view.dart';
 /// Pass [theme] to override colors, spacing, or typography; omit it
 /// and the picker matches the ambient Material 3 app theme.
 ///
+/// Built on [showGeneralDialog] rather than [showDialog] (Task 4.1) so
+/// the dialog's entrance/exit gets an explicit fade+scale transition,
+/// rather than relying on whatever transition (if any) the platform's
+/// default route happens to apply. `barrierDismissible`/`barrierColor`
+/// are set to match `showDialog`'s own defaults, so tap-outside-to-
+/// dismiss behavior is unchanged from before this task.
+///
 /// Error handling (see [EthiopianDatePickerDialog] for details):
 /// - `initialDate` outside `[firstDate, lastDate]` is silently clamped
 ///   into range rather than throwing or producing an unselectable
@@ -46,21 +53,47 @@ Future<EthiopianDate?> showEthiopianDatePicker({
   final EthiopianDate resolvedLastDate =
       lastDate ?? EthiopianDate(2100, 12, 30);
 
-  return showDialog<EthiopianDate>(
+  return showGeneralDialog<EthiopianDate>(
     context: context,
-    builder: (context) => EthiopianDatePickerDialog(
-      initialDate: resolvedInitialDate,
-      firstDate: resolvedFirstDate,
-      lastDate: resolvedLastDate,
-      locale: locale,
-      theme: theme,
-    ),
+    barrierDismissible: true,
+    barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 200),
+    pageBuilder: (context, animation, secondaryAnimation) {
+      return SafeArea(
+        child: EthiopianDatePickerDialog(
+          initialDate: resolvedInitialDate,
+          firstDate: resolvedFirstDate,
+          lastDate: resolvedLastDate,
+          locale: locale,
+          theme: theme,
+        ),
+      );
+    },
+    transitionBuilder: (context, animation, secondaryAnimation, child) {
+      final CurvedAnimation curved = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutBack,
+        reverseCurve: Curves.easeIn,
+      );
+      return FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.9, end: 1.0).animate(curved),
+          child: child,
+        ),
+      );
+    },
   );
 }
 
 /// The dialog widget itself, exposed publicly in case callers want to
 /// embed it directly (e.g. inside a custom bottom sheet) rather than
-/// go through [showEthiopianDatePicker].
+/// go through [showEthiopianDatePicker]. Note that going this route
+/// bypasses the fade+scale entrance/exit transition described above -
+/// that animation lives in [showEthiopianDatePicker]'s use of
+/// `showGeneralDialog`, not in this widget itself, since a widget
+/// can't animate its own route transition.
 ///
 /// Error handling:
 /// - A debug-mode [assert] catches `firstDate > lastDate` misconfig
@@ -106,7 +139,8 @@ class EthiopianDatePickerDialog extends StatefulWidget {
       _EthiopianDatePickerDialogState();
 }
 
-class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
+class _EthiopianDatePickerDialogState
+    extends State<EthiopianDatePickerDialog> {
   late EthiopianDate _selectedDate;
   late EthiopianDate _displayedMonth;
 
@@ -123,7 +157,8 @@ class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
       min: widget.firstDate,
       max: widget.lastDate,
     );
-    _displayedMonth = EthiopianDate(_selectedDate.year, _selectedDate.month, 1);
+    _displayedMonth =
+        EthiopianDate(_selectedDate.year, _selectedDate.month, 1);
   }
 
   void _handleDateSelected(EthiopianDate date) {

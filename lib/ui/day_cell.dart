@@ -10,6 +10,12 @@ import '../theme/picker_theme.dart';
 /// styles come from [theme]; pass one explicitly to override the
 /// default look, or omit it to fall back to
 /// [EthiopianDatePickerTheme.material3].
+///
+/// The [InkWell] wrapping each cell provides Material's standard
+/// ripple on tap (Task 4.1); its splash/highlight colors are tied to
+/// [theme.selectedColor] rather than left at the ambient default, so a
+/// themed picker's ripple actually matches its own palette instead of
+/// whatever color happens to be ambient in the surrounding app.
 class EthiopianDayCell extends StatelessWidget {
   const EthiopianDayCell({
     super.key,
@@ -64,6 +70,8 @@ class EthiopianDayCell extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           customBorder: const CircleBorder(),
+          splashColor: resolvedTheme.selectedColor.withValues(alpha: 0.24),
+          highlightColor: resolvedTheme.selectedColor.withValues(alpha: 0.12),
           child: Container(
             decoration: BoxDecoration(
               color: backgroundColor,

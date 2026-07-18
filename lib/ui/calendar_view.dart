@@ -24,6 +24,10 @@ import 'header.dart';
 /// child cell and the header, so the whole grid stays visually
 /// consistent even though each child could theoretically resolve its
 /// own default independently.
+///
+/// The day grid cross-fades and slides slightly when [displayedMonth]
+/// changes (Task 4.1), keyed on year/month so Flutter treats each
+/// month as a distinct subtree rather than patching cell-by-cell.
 class EthiopianCalendarView extends StatelessWidget {
   const EthiopianCalendarView({
     super.key,
@@ -69,6 +73,12 @@ class EthiopianCalendarView extends StatelessWidget {
   /// Fixed width for the whole widget, matching Material's own date
   /// picker footprint. 7 columns at ~46px each plus minor padding.
   static const double _width = 328;
+
+  /// Duration for the month-change slide/fade. Kept short (well under
+  /// the ~300ms threshold where a transition starts to feel laggy
+  /// rather than snappy) so rapid next/next/next taps don't queue up
+  /// a visibly sluggish backlog of animations.
+  static const Duration _monthTransitionDuration = Duration(milliseconds: 220);
 
   static const List<String> _weekdayLabels = [
     'Mon',
@@ -132,16 +142,32 @@ class EthiopianCalendarView extends StatelessWidget {
                 .toList(),
           ),
           SizedBox(height: resolvedTheme.spacing.xs),
-          GridView.count(
-            crossAxisCount: 7,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.0,
-            children: [
-              for (int i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
-              for (int day = 1; day <= daysInMonth; day++)
-                _buildDayCell(year, month, day, today, resolvedTheme),
-            ],
+          AnimatedSwitcher(
+            duration: _monthTransitionDuration,
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
+            transitionBuilder: (child, animation) {
+              final Animation<Offset> slide = Tween<Offset>(
+                begin: const Offset(0.06, 0),
+                end: Offset.zero,
+              ).animate(animation);
+              return FadeTransition(
+                opacity: animation,
+                child: SlideTransition(position: slide, child: child),
+              );
+            },
+            child: GridView.count(
+              key: ValueKey<String>('$year-$month'),
+              crossAxisCount: 7,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              childAspectRatio: 1.0,
+              children: [
+                for (int i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
+                for (int day = 1; day <= daysInMonth; day++)
+                  _buildDayCell(year, month, day, today, resolvedTheme),
+              ],
+            ),
           ),
         ],
       ),
