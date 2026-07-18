@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/ethiopian_date.dart';
+import '../core/ethiopian_date_range.dart';
 import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'day_cell.dart';
@@ -10,8 +11,14 @@ import 'header.dart';
 /// header row and a navigable month/year header above it.
 ///
 /// Stateless and fully controlled: the caller owns [displayedMonth]
-/// (which year/month is currently shown) and [selectedDate], and reacts
-/// to [onDateSelected] / [onMonthChanged].
+/// (which year/month is currently shown) and either [selectedDate] or
+/// [selectedRange], and reacts to [onDateSelected] / [onMonthChanged].
+/// A tap always calls [onDateSelected] with the tapped date regardless
+/// of which mode is active - this widget does not implement the
+/// "tap start, tap end, re-tap to reset" state machine itself (Task
+/// 4.2's interaction flow); that logic belongs to whatever holds the
+/// state and decides what a given tap means. This widget's only job is
+/// rendering whatever selection it's told about.
 ///
 /// Rendered at a fixed intrinsic width (matching the footprint of
 /// Material's own date picker) so it behaves predictably regardless of
@@ -37,6 +44,7 @@ class EthiopianCalendarView extends StatelessWidget {
     required this.onDateSelected,
     required this.onMonthChanged,
     this.selectedDate,
+    this.selectedRange,
     this.locale,
     this.theme,
   });
@@ -51,9 +59,15 @@ class EthiopianCalendarView extends StatelessWidget {
   /// The latest selectable date (inclusive).
   final EthiopianDate lastDate;
 
-  /// The currently selected date, if any. Highlighted when it falls
-  /// within [displayedMonth].
+  /// The currently selected date in single-date mode. Ignored whenever
+  /// [selectedRange] is non-null - the two are mutually exclusive, and
+  /// range mode always takes priority when both happen to be set.
   final EthiopianDate? selectedDate;
+
+  /// The currently selected range, if range mode is active. When set,
+  /// each day cell renders as a range start/end cap or an in-between
+  /// band day rather than a plain single selection (Task 4.2).
+  final EthiopianDateRange? selectedRange;
 
   /// Called when the user taps a selectable day.
   final ValueChanged<EthiopianDate> onDateSelected;
@@ -183,8 +197,23 @@ class EthiopianCalendarView extends StatelessWidget {
   ) {
     final EthiopianDate date = EthiopianDate(year, month, day);
     final bool isDisabled = date.isBefore(firstDate) || date.isAfter(lastDate);
-    final bool isSelected = selectedDate != null && date == selectedDate;
     final bool isToday = date == today;
+
+    // Range mode takes priority over single-date mode whenever both
+    // happen to be set - selectedDate is only consulted when
+    // selectedRange is null, so the two never fight over a cell.
+    final bool isSelected =
+        selectedRange == null && selectedDate != null && date == selectedDate;
+
+    bool isRangeStart = false;
+    bool isRangeEnd = false;
+    bool isInRange = false;
+    final EthiopianDateRange? range = selectedRange;
+    if (range != null) {
+      isRangeStart = date == range.start;
+      isRangeEnd = date == range.end;
+      isInRange = range.contains(date);
+    }
 
     return EthiopianDayCell(
       day: day,
@@ -192,6 +221,9 @@ class EthiopianCalendarView extends StatelessWidget {
       isToday: isToday,
       isDisabled: isDisabled,
       theme: resolvedTheme,
+      isRangeStart: isRangeStart,
+      isRangeEnd: isRangeEnd,
+      isInRange: isInRange,
       onTap: isDisabled ? null : () => onDateSelected(date),
     );
   }
