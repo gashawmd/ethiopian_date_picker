@@ -71,7 +71,7 @@ void main() {
       // The dialog should now be showing.
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.text('OK'), findsOneWidget);
-      expect(find.text('CANCEL'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
 
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
@@ -86,7 +86,7 @@ void main() {
       await tester.tap(find.text('Open picker'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('CANCEL'));
+      await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
       expect(find.text('null result'), findsOneWidget);

@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../theme/picker_theme.dart';
 
+/// Minimum tap target size per WCAG 2.5.5 / Material accessibility
+/// guidance. Applied to the cell's hit area regardless of the visual
+/// circle's own diameter, so a compact theme never shrinks the actual
+/// tappable/focusable region below 48x48.
+const double _kMinTapTarget = 48.0;
+
 /// A single day cell within the Ethiopian calendar grid.
 ///
 /// Mirrors Material's own date picker day styling: a filled circle for
@@ -11,18 +17,24 @@ import '../theme/picker_theme.dart';
 /// default look, or omit it to fall back to
 /// [EthiopianDatePickerTheme.material3].
 ///
-/// The [InkWell] wrapping each cell provides Material's standard
-/// ripple on tap (Task 4.1); its splash/highlight colors are tied to
-/// [theme.selectedColor] rather than left at the ambient default.
+/// Accessibility (Task 5.3):
+/// - [semanticLabel] is spoken by screen readers in place of the bare
+///   visual day number; it's built by the caller
+///   ([EthiopianCalendarView]) since only that widget knows the
+///   weekday/month/year/today-ness of the cell.
+/// - The tappable/focusable region is a fixed [_kMinTapTarget] square
+///   regardless of the visual circle's size.
+/// - A focused cell gets a visible stroked ring, not just a color
+///   change, so it's identifiable without relying on color perception.
+/// - [autofocus] lets the caller land initial keyboard/screen-reader
+///   focus on a specific cell (selected day, today, or first
+///   selectable day) when the grid first appears.
 ///
 /// Range highlighting (Task 4.2): [isRangeStart], [isRangeEnd], and
 /// [isInRange] are independent of [isSelected] - a cell used in range
 /// mode passes `isSelected: false` and drives its appearance entirely
-/// through the range flags instead, so the two selection concepts
-/// never fight over how a cell looks. A day that is both the range
-/// start and end (a single-day range) renders exactly like a plain
-/// single-date selection, with no tinted band on either side.
-class EthiopianDayCell extends StatelessWidget {
+/// through the range flags instead.
+class EthiopianDayCell extends StatefulWidget {
   const EthiopianDayCell({
     super.key,
     required this.day,
@@ -30,10 +42,12 @@ class EthiopianDayCell extends StatelessWidget {
     required this.isToday,
     required this.isDisabled,
     required this.onTap,
+    required this.semanticLabel,
     this.theme,
     this.isRangeStart = false,
     this.isRangeEnd = false,
     this.isInRange = false,
+    this.autofocus = false,
   });
 
   final int day;
@@ -45,28 +59,43 @@ class EthiopianDayCell extends StatelessWidget {
   /// taps, so there's exactly one source of truth for "is this tappable".
   final VoidCallback? onTap;
 
+  /// Full spoken label for this day (e.g. "Monday, Meskerem 5, 2018,
+  /// Today"). Replaces the bare digit a screen reader would otherwise
+  /// read from the visible [Text].
+  final String semanticLabel;
+
   /// Optional visual theme. Falls back to
   /// [EthiopianDatePickerTheme.material3] when omitted.
   final EthiopianDatePickerTheme? theme;
 
-  /// True if this cell is the start day of an active range selection.
   final bool isRangeStart;
-
-  /// True if this cell is the end day of an active range selection.
   final bool isRangeEnd;
-
-  /// True if this cell falls anywhere within an active range,
-  /// inclusive of both [isRangeStart] and [isRangeEnd] days. A day
-  /// can be `isInRange` without being a cap - that's what produces
-  /// the continuous tinted band between the two endpoints.
   final bool isInRange;
+
+  /// Whether this cell should request focus as soon as it's built.
+  /// At most one cell in a given grid should set this to true.
+  final bool autofocus;
+
+  @override
+  State<EthiopianDayCell> createState() => _EthiopianDayCellState();
+}
+
+class _EthiopianDayCellState extends State<EthiopianDayCell> {
+  bool _isFocused = false;
+
+  void _handleFocusChange(bool focused) {
+    if (focused != _isFocused) {
+      setState(() => _isFocused = focused);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final EthiopianDatePickerTheme resolvedTheme =
-        theme ?? EthiopianDatePickerTheme.material3(context);
+        widget.theme ?? EthiopianDatePickerTheme.material3(context);
 
-    final bool showFilledCircle = isSelected || isRangeStart || isRangeEnd;
+    final bool showFilledCircle =
+        widget.isSelected || widget.isRangeStart || widget.isRangeEnd;
 
     Color circleColor = Colors.transparent;
     Color textColor = resolvedTheme.typography.dayStyle.color ??
@@ -76,93 +105,114 @@ class EthiopianDayCell extends StatelessWidget {
     if (showFilledCircle) {
       circleColor = resolvedTheme.selectedColor;
       textColor = resolvedTheme.onSelectedColor;
-    } else if (isToday) {
+    } else if (widget.isToday) {
       border = Border.all(color: resolvedTheme.todayBorderColor, width: 1.5);
       textColor = resolvedTheme.primaryColor;
-    } else if (isInRange) {
-      // A day strictly inside the range (not a cap) - tinted band,
-      // no filled circle, but text still picks up the accent color
-      // so it reads as "part of the selection" rather than a plain day.
+    } else if (widget.isInRange) {
       textColor = resolvedTheme.primaryColor;
     }
 
-    if (isDisabled) {
+    if (widget.isDisabled) {
       textColor = resolvedTheme.disabledColor;
     }
 
-    // Which half (or both halves) of this cell paint the tinted band:
-    // - strictly-middle day: both halves, so bands touch left/right
-    //   neighbors and read as one continuous strip.
-    // - range start (not also end): only the right half, so the band
-    //   begins at this day and doesn't bleed into the day before it.
-    // - range end (not also start): only the left half.
-    // - single-day range (start == end): neither half - falls back to
-    //   looking like a plain filled selection, matching Material's own
-    //   date range picker behavior for a one-day range.
-    final bool paintLeftBand = isInRange && !isRangeStart;
-    final bool paintRightBand = isInRange && !isRangeEnd;
+    final bool paintLeftBand = widget.isInRange && !widget.isRangeStart;
+    final bool paintRightBand = widget.isInRange && !widget.isRangeEnd;
     final Color bandColor = resolvedTheme.selectedColor.withValues(alpha: 0.12);
 
+    // Focus ring takes priority over the "today" outline when both
+    // would apply - a focused cell is always visibly identifiable,
+    // even if that means today's own outline is briefly superseded
+    // while focus sits on it.
+    final Border? effectiveBorder = _isFocused
+        ? Border.all(color: resolvedTheme.primaryColor, width: 2)
+        : border;
+
+    // Cap text scaling within the fixed-size circle so an extreme
+    // system font-scale setting can't overflow the 48px cell - while
+    // still allowing meaningful growth for low-vision users.
+    final TextScaler clampedScaler =
+        MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.3);
+
     return Padding(
-      // Zero padding on whichever side(s) paint a band, so adjacent
-      // cells' bands touch edge-to-edge instead of leaving a visible
-      // gap - this is what makes the highlight read as one continuous
-      // strip across a row rather than a row of separate tinted dots.
       padding: EdgeInsets.only(
         top: resolvedTheme.spacing.xs / 2,
         bottom: resolvedTheme.spacing.xs / 2,
         left: paintLeftBand ? 0 : resolvedTheme.spacing.xs / 2,
         right: paintRightBand ? 0 : resolvedTheme.spacing.xs / 2,
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (isInRange)
-            Positioned.fill(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      color: paintLeftBand ? bandColor : Colors.transparent,
+      child: Semantics(
+        label: widget.semanticLabel,
+        button: true,
+        enabled: !widget.isDisabled,
+        selected: widget.isSelected || widget.isRangeStart || widget.isRangeEnd,
+        excludeSemantics: true,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            if (widget.isInRange)
+              Positioned.fill(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        color: paintLeftBand ? bandColor : Colors.transparent,
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      color: paintRightBand ? bandColor : Colors.transparent,
+                    Expanded(
+                      child: Container(
+                        color: paintRightBand ? bandColor : Colors.transparent,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: InkWell(
-              onTap: onTap,
-              customBorder: const CircleBorder(),
-              splashColor: resolvedTheme.selectedColor.withValues(alpha: 0.24),
-              highlightColor:
-                  resolvedTheme.selectedColor.withValues(alpha: 0.12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: circleColor,
-                  border: border,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  '$day',
-                  style: resolvedTheme.typography.dayStyle.copyWith(
-                    color: textColor,
-                    fontWeight: showFilledCircle || isToday
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
+                  ],
                 ),
               ),
+            SizedBox(
+              width: _kMinTapTarget,
+              height: _kMinTapTarget,
+              child: Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  onTap: widget.onTap,
+                  onFocusChange: _handleFocusChange,
+                  autofocus: widget.autofocus,
+                  customBorder: const CircleBorder(),
+                  splashColor:
+                      resolvedTheme.selectedColor.withValues(alpha: 0.24),
+                  highlightColor:
+                      resolvedTheme.selectedColor.withValues(alpha: 0.12),
+                  // The ring is drawn explicitly below, so the default
+                  // color-wash focus highlight is suppressed here.
+                  focusColor: Colors.transparent,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: circleColor,
+                        border: effectiveBorder,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: MediaQuery(
+                        data: MediaQuery.of(context)
+                            .copyWith(textScaler: clampedScaler),
+                        child: Text(
+                          '${widget.day}',
+                          style: resolvedTheme.typography.dayStyle.copyWith(
+                            color: textColor,
+                            fontWeight: showFilledCircle || widget.isToday
+                                ? FontWeight.w600
+                                : FontWeight.normal,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

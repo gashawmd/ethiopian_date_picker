@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../core/ethiopian_date.dart';
+import '../localization/ethiopian_locale.dart';
 import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
@@ -107,6 +109,10 @@ Future<EthiopianDate?> showEthiopianDatePicker({
 ///   predates a newly-tightened `firstDate`), so rather than asserting
 ///   on it, it's silently clamped into range via
 ///   [EthiopianDateUtils.clamp].
+///
+/// Accessibility (Task 5.3): the dialog binds Escape to close itself
+/// via [CallbackShortcuts], and both action buttons carry an explicit
+/// 48x48 minimum tap target.
 class EthiopianDatePickerDialog extends StatefulWidget {
   EthiopianDatePickerDialog({
     super.key,
@@ -139,8 +145,7 @@ class EthiopianDatePickerDialog extends StatefulWidget {
       _EthiopianDatePickerDialogState();
 }
 
-class _EthiopianDatePickerDialogState
-    extends State<EthiopianDatePickerDialog> {
+class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
   late EthiopianDate _selectedDate;
   late EthiopianDate _displayedMonth;
 
@@ -157,8 +162,7 @@ class _EthiopianDatePickerDialogState
       min: widget.firstDate,
       max: widget.lastDate,
     );
-    _displayedMonth =
-        EthiopianDate(_selectedDate.year, _selectedDate.month, 1);
+    _displayedMonth = EthiopianDate(_selectedDate.year, _selectedDate.month, 1);
   }
 
   void _handleDateSelected(EthiopianDate date) {
@@ -181,46 +185,56 @@ class _EthiopianDatePickerDialogState
   Widget build(BuildContext context) {
     final EthiopianDatePickerTheme resolvedTheme =
         widget.theme ?? EthiopianDatePickerTheme.material3(context);
+    final EthiopianLocaleData localeData =
+        resolveEthiopianLocaleData(widget.locale);
 
-    return Dialog(
-      backgroundColor: resolvedTheme.backgroundColor,
-      child: Padding(
-        padding: EdgeInsets.all(resolvedTheme.spacing.md),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            EthiopianCalendarView(
-              displayedMonth: _displayedMonth,
-              firstDate: widget.firstDate,
-              lastDate: widget.lastDate,
-              selectedDate: _selectedDate,
-              locale: widget.locale,
-              theme: resolvedTheme,
-              onDateSelected: _handleDateSelected,
-              onMonthChanged: _handleMonthChanged,
-            ),
-            SizedBox(height: resolvedTheme.spacing.sm),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: _handleCancel,
-                  style: TextButton.styleFrom(
-                    foregroundColor: resolvedTheme.primaryColor,
+    return CallbackShortcuts(
+      bindings: <ShortcutActivator, VoidCallback>{
+        const SingleActivator(LogicalKeyboardKey.escape): () =>
+            Navigator.of(context).maybePop(),
+      },
+      child: Dialog(
+        backgroundColor: resolvedTheme.backgroundColor,
+        child: Padding(
+          padding: EdgeInsets.all(resolvedTheme.spacing.md),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              EthiopianCalendarView(
+                displayedMonth: _displayedMonth,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
+                selectedDate: _selectedDate,
+                locale: widget.locale,
+                theme: resolvedTheme,
+                onDateSelected: _handleDateSelected,
+                onMonthChanged: _handleMonthChanged,
+              ),
+              SizedBox(height: resolvedTheme.spacing.sm),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: _handleCancel,
+                    style: TextButton.styleFrom(
+                      foregroundColor: resolvedTheme.primaryColor,
+                      minimumSize: const Size(48, 48),
+                    ),
+                    child: Text(localeData.cancelLabel),
                   ),
-                  child: const Text('CANCEL'),
-                ),
-                SizedBox(width: resolvedTheme.spacing.sm),
-                TextButton(
-                  onPressed: _handleOk,
-                  style: TextButton.styleFrom(
-                    foregroundColor: resolvedTheme.primaryColor,
+                  SizedBox(width: resolvedTheme.spacing.sm),
+                  TextButton(
+                    onPressed: _handleOk,
+                    style: TextButton.styleFrom(
+                      foregroundColor: resolvedTheme.primaryColor,
+                      minimumSize: const Size(48, 48),
+                    ),
+                    child: Text(localeData.okLabel),
                   ),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

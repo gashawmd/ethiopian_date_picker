@@ -59,7 +59,7 @@ void main() {
 
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.text('OK'), findsOneWidget);
-      expect(find.text('CANCEL'), findsOneWidget);
+      expect(find.text('Cancel'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
 
@@ -277,7 +277,7 @@ void main() {
       await tester.tap(find.text('Open'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('CANCEL'));
+      await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
 
       expect(completed, isTrue);

@@ -13,3 +13,6 @@ analyze_output.json
 dialog_test_results.json
 error_handling_results.json
 widget_test_results.json
+all_test_results.json
+analyze_output.log
+/tmp/test_run_*.log

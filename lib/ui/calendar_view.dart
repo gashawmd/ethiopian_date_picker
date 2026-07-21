@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../core/ethiopian_date.dart';
 import '../core/ethiopian_date_range.dart';
+import '../localization/ethiopian_locale.dart';
 import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'day_cell.dart';
@@ -21,8 +22,9 @@ import 'header.dart';
 /// rendering whatever selection it's told about.
 ///
 /// Rendered at a fixed intrinsic width (matching the footprint of
-/// Material's own date picker) so it behaves predictably regardless of
-/// how much space its parent offers - without this, an unconstrained
+/// Material's own date picker, widened slightly for Task 5.3's 48px
+/// minimum tap targets) so it behaves predictably regardless of how
+/// much space its parent offers - without this, an unconstrained
 /// parent causes the grid to stretch to fill available width, producing
 /// oversized cells and vertical overflow.
 ///
@@ -30,11 +32,23 @@ import 'header.dart';
 /// omitted, then passes that single resolved instance down to every
 /// child cell and the header, so the whole grid stays visually
 /// consistent even though each child could theoretically resolve its
-/// own default independently.
+/// own default independently. Resolves [locale] the same way (Task
+/// 5.1) to drive the weekday row and hand off to the header for month
+/// names and navigation tooltips.
 ///
 /// The day grid cross-fades and slides slightly when [displayedMonth]
 /// changes (Task 4.1), keyed on year/month so Flutter treats each
 /// month as a distinct subtree rather than patching cell-by-cell.
+///
+/// Accessibility (Task 5.3): the day grid is wrapped in a
+/// [FocusTraversalGroup] so keyboard/screen-reader focus moves between
+/// day cells in reading order, and each cell is given a full spoken
+/// [Semantics] label (weekday, month, day, year, "today" where
+/// applicable) rather than just the bare visible digit. Initial focus
+/// on grid build is resolved by [_resolveAutofocusDate]: the current
+/// selection if it falls in this month, else today if it falls in this
+/// month, else the first selectable day - so month navigation never
+/// leaves the grid with nowhere for focus to land.
 class EthiopianCalendarView extends StatelessWidget {
   const EthiopianCalendarView({
     super.key,
@@ -76,8 +90,9 @@ class EthiopianCalendarView extends StatelessWidget {
   /// previous/next arrows in the header.
   final ValueChanged<EthiopianDate> onMonthChanged;
 
-  /// Optional locale code, forwarded to [EthiopianCalendarHeader]. See
-  /// [EthiopianCalendarHeader.resolveLocale] for fallback behavior.
+  /// Optional locale code (e.g. `'am'`), forwarded to
+  /// [EthiopianCalendarHeader] and used directly for the weekday row.
+  /// See [EthiopianCalendarHeader.resolveLocale] for fallback behavior.
   final String? locale;
 
   /// Optional visual theme. Falls back to
@@ -85,8 +100,9 @@ class EthiopianCalendarView extends StatelessWidget {
   final EthiopianDatePickerTheme? theme;
 
   /// Fixed width for the whole widget, matching Material's own date
-  /// picker footprint. 7 columns at ~46px each plus minor padding.
-  static const double _width = 328;
+  /// picker footprint. 7 columns at 48px each (Task 5.3's minimum tap
+  /// target) plus minor padding.
+  static const double _width = 364;
 
   /// Duration for the month-change slide/fade. Kept short (well under
   /// the ~300ms threshold where a transition starts to feel laggy
@@ -94,20 +110,11 @@ class EthiopianCalendarView extends StatelessWidget {
   /// a visibly sluggish backlog of animations.
   static const Duration _monthTransitionDuration = Duration(milliseconds: 220);
 
-  static const List<String> _weekdayLabels = [
-    'Mon',
-    'Tue',
-    'Wed',
-    'Thu',
-    'Fri',
-    'Sat',
-    'Sun',
-  ];
-
   @override
   Widget build(BuildContext context) {
     final EthiopianDatePickerTheme resolvedTheme =
         theme ?? EthiopianDatePickerTheme.material3(context);
+    final EthiopianLocaleData localeData = resolveEthiopianLocaleData(locale);
 
     final int year = displayedMonth.year;
     final int month = displayedMonth.month;
@@ -123,6 +130,9 @@ class EthiopianCalendarView extends StatelessWidget {
       previousMonth.month,
       EthiopianDateUtils.daysInMonth(previousMonth.year, previousMonth.month),
     );
+
+    final EthiopianDate? autofocusDate =
+        _resolveAutofocusDate(today, daysInMonth);
 
     return Container(
       width: _width,
@@ -142,7 +152,7 @@ class EthiopianCalendarView extends StatelessWidget {
           ),
           SizedBox(height: resolvedTheme.spacing.sm),
           Row(
-            children: _weekdayLabels
+            children: localeData.weekdayNamesShort
                 .map(
                   (label) => Expanded(
                     child: Center(
@@ -170,17 +180,29 @@ class EthiopianCalendarView extends StatelessWidget {
                 child: SlideTransition(position: slide, child: child),
               );
             },
-            child: GridView.count(
+            child: FocusTraversalGroup(
               key: ValueKey<String>('$year-$month'),
-              crossAxisCount: 7,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.0,
-              children: [
-                for (int i = 0; i < leadingBlanks; i++) const SizedBox.shrink(),
-                for (int day = 1; day <= daysInMonth; day++)
-                  _buildDayCell(year, month, day, today, resolvedTheme),
-              ],
+              child: GridView.count(
+                crossAxisCount: 7,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: 1.0,
+                children: [
+                  for (int i = 0; i < leadingBlanks; i++)
+                    const SizedBox.shrink(),
+                  for (int day = 1; day <= daysInMonth; day++)
+                    _buildDayCell(
+                      year,
+                      month,
+                      day,
+                      today,
+                      leadingBlanks,
+                      localeData,
+                      autofocusDate,
+                      resolvedTheme,
+                    ),
+                ],
+              ),
             ),
           ),
         ],
@@ -193,6 +215,9 @@ class EthiopianCalendarView extends StatelessWidget {
     int month,
     int day,
     EthiopianDate today,
+    int leadingBlanks,
+    EthiopianLocaleData localeData,
+    EthiopianDate? autofocusDate,
     EthiopianDatePickerTheme resolvedTheme,
   ) {
     final EthiopianDate date = EthiopianDate(year, month, day);
@@ -215,6 +240,10 @@ class EthiopianCalendarView extends StatelessWidget {
       isInRange = range.contains(date);
     }
 
+    // Weekday index for this day: leadingBlanks is the index day 1
+    // falls on, so day N falls (N - 1) slots later, wrapping at 7.
+    final int weekdayIndex = (leadingBlanks + day - 1) % 7;
+
     return EthiopianDayCell(
       day: day,
       isSelected: isSelected,
@@ -224,8 +253,54 @@ class EthiopianCalendarView extends StatelessWidget {
       isRangeStart: isRangeStart,
       isRangeEnd: isRangeEnd,
       isInRange: isInRange,
+      autofocus: autofocusDate != null && date == autofocusDate,
+      semanticLabel: _semanticLabel(
+        date: date,
+        weekdayIndex: weekdayIndex,
+        localeData: localeData,
+        isToday: isToday,
+      ),
       onTap: isDisabled ? null : () => onDateSelected(date),
     );
+  }
+
+  /// Full spoken label for a day cell: weekday, month, day, year, and
+  /// (when applicable) the localized "today" word.
+  String _semanticLabel({
+    required EthiopianDate date,
+    required int weekdayIndex,
+    required EthiopianLocaleData localeData,
+    required bool isToday,
+  }) {
+    final String weekday = localeData.weekdayNamesShort[weekdayIndex];
+    final String monthName = localeData.monthNames[date.month - 1];
+    final String base = '$weekday, $monthName ${date.day}, ${date.year}';
+    return isToday ? '$base, ${localeData.todayLabel}' : base;
+  }
+
+  /// Picks which cell (if any) should receive initial focus: the
+  /// current selection if it falls in this month, else today if it
+  /// falls in this month, else the first selectable day - so month
+  /// navigation never leaves the grid with nowhere for focus to land.
+  EthiopianDate? _resolveAutofocusDate(EthiopianDate today, int daysInMonth) {
+    final EthiopianDate? selected = selectedRange?.start ?? selectedDate;
+    if (selected != null &&
+        selected.year == displayedMonth.year &&
+        selected.month == displayedMonth.month) {
+      return selected;
+    }
+    if (today.year == displayedMonth.year &&
+        today.month == displayedMonth.month) {
+      return today;
+    }
+    for (int day = 1; day <= daysInMonth; day++) {
+      final EthiopianDate candidate =
+          EthiopianDate(displayedMonth.year, displayedMonth.month, day);
+      if (!candidate.isBefore(firstDate) && !candidate.isAfter(lastDate)) {
+        return candidate;
+      }
+    }
+    return null;
   }
 
   /// Returns the 1st day of the month [delta] steps away from
