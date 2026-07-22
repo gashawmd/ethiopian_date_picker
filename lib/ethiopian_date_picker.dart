@@ -17,4 +17,5 @@ export 'theme/picker_theme.dart';
 export 'core/ethiopian_date_range.dart';
 export 'core/ethiopian_date_range_selection.dart';
 export 'ui/date_range_picker_dialog.dart';
+export 'ui/date_picker_dialog.dart';
 export 'localization/ethiopian_locale.dart';

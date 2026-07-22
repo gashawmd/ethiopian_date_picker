@@ -30,5 +30,5 @@ final EthiopianLocaleData tiLocaleData = EthiopianLocaleData(
   cancelLabel: 'ሰርዝ',
   previousMonthTooltip: 'ዝሓለፈ ወርሒ',
   nextMonthTooltip: 'ዝመጽእ ወርሒ',
-  todayLabel: 'ሎሚ', // Confirmed via 3 independent dictionary sources; native-speaker review recommended.
+  todayLabel: 'ሎሚ',
 );

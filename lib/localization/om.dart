@@ -1,17 +1,13 @@
 import 'ethiopian_locale.dart';
 
 /// Afaan Oromo localization data for the Ethiopian calendar.
-///
-/// Month and weekday names follow commonly used Afaan Oromo calendar
-/// terminology. The 13th month (Pagume) may vary between sources;
-/// `Qaammee` is used here and may require native-speaker validation.
 final EthiopianLocaleData omLocaleData = EthiopianLocaleData(
   languageCode: 'om',
   monthNames: [
     'Fulbaana',
     'Onkoloolessa',
     'Sadaasa',
-    'Mudde',
+    'Muddee',
     'Amajjii',
     'Guraandhala',
     'Bitootessa',
@@ -20,7 +16,7 @@ final EthiopianLocaleData omLocaleData = EthiopianLocaleData(
     'Waxabajjii',
     'Adoolessa',
     'Hagayya',
-    'Qaammee',
+    'Qaam’ee',
   ],
   weekdayNamesShort: [
     'Wiix',
