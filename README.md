@@ -1,4 +1,4 @@
-# ethiopian_date_picker
+# flutter_ethiopian_date_picker
 
 A Flutter package for working with the Ethiopian (Ge'ez) calendar — conversion, a
 Material 3 date picker, range selection, form field integration, theming, and
@@ -37,7 +37,7 @@ localization (English, Amharic, Afaan Oromo, Tigrinya).
 
 ```yaml
 dependencies:
-  ethiopian_date_picker: ^0.4.0
+  flutter_ethiopian_date_picker: ^0.4.0
 ```
 
 ```

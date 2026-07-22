@@ -1,10 +1,10 @@
-import 'package:ethiopian_date_picker/core/ethiopian_date.dart';
-import 'package:ethiopian_date_picker/localization/am.dart';
-import 'package:ethiopian_date_picker/localization/en.dart';
-import 'package:ethiopian_date_picker/localization/ethiopian_locale.dart';
-import 'package:ethiopian_date_picker/localization/om.dart';
-import 'package:ethiopian_date_picker/localization/ti.dart';
-import 'package:ethiopian_date_picker/ui/date_picker_dialog.dart';
+import 'package:flutter_ethiopian_date_picker/core/ethiopian_date.dart';
+import 'package:flutter_ethiopian_date_picker/localization/am.dart';
+import 'package:flutter_ethiopian_date_picker/localization/en.dart';
+import 'package:flutter_ethiopian_date_picker/localization/ethiopian_locale.dart';
+import 'package:flutter_ethiopian_date_picker/localization/om.dart';
+import 'package:flutter_ethiopian_date_picker/localization/ti.dart';
+import 'package:flutter_ethiopian_date_picker/ui/date_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

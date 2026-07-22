@@ -16,3 +16,4 @@ widget_test_results.json
 all_test_results.json
 analyze_output.log
 /tmp/test_run_*.log
+example/build/

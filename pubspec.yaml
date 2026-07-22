@@ -1,4 +1,4 @@
-name: ethiopian_date_picker
+name: flutter_ethiopian_date_picker
 description: A customizable Ethiopian (Ge'ez) calendar date picker widget for Flutter.
 version: 0.0.1
 homepage: https://github.com/gashawmd/ethiopian_date_picker

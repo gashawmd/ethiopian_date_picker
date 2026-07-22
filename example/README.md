@@ -1,4 +1,4 @@
-# ethiopian_date_picker_example
+# flutter_ethiopian_date_picker_example
 
 A new Flutter project.
 

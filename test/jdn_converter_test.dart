@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:ethiopian_date_picker/core/jdn_converter.dart';
+import 'package:flutter_ethiopian_date_picker/core/jdn_converter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

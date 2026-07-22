@@ -18,7 +18,7 @@
 // Run: flutter pub add --dev provider flutter_riverpod flutter_bloc
 //      flutter test test/state_management_smoke_test.dart
 
-import 'package:ethiopian_date_picker/ethiopian_date_picker.dart';
+import 'package:flutter_ethiopian_date_picker/flutter_ethiopian_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 // flutter_riverpod and provider both export ChangeNotifierProvider and

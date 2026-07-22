@@ -21,7 +21,7 @@
 // image locally via `docker run ... flutter test --update-goldens`),
 // not on a local dev machine.
 
-import 'package:ethiopian_date_picker/ethiopian_date_picker.dart';
+import 'package:flutter_ethiopian_date_picker/flutter_ethiopian_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';

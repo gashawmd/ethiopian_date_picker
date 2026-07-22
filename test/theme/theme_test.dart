@@ -1,9 +1,9 @@
-import 'package:ethiopian_date_picker/core/ethiopian_date.dart';
-import 'package:ethiopian_date_picker/theme/picker_theme.dart';
-import 'package:ethiopian_date_picker/ui/calendar_view.dart';
-import 'package:ethiopian_date_picker/ui/date_picker_dialog.dart';
-import 'package:ethiopian_date_picker/ui/day_cell.dart';
-import 'package:ethiopian_date_picker/ui/header.dart';
+import 'package:flutter_ethiopian_date_picker/core/ethiopian_date.dart';
+import 'package:flutter_ethiopian_date_picker/theme/picker_theme.dart';
+import 'package:flutter_ethiopian_date_picker/ui/calendar_view.dart';
+import 'package:flutter_ethiopian_date_picker/ui/date_picker_dialog.dart';
+import 'package:flutter_ethiopian_date_picker/ui/day_cell.dart';
+import 'package:flutter_ethiopian_date_picker/ui/header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

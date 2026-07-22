@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:ethiopian_date_picker/core/ethiopian_date.dart';
-import 'package:ethiopian_date_picker/core/ethiopian_date_interop.dart';
-import 'package:ethiopian_date_picker/core/jdn_converter.dart';
+import 'package:flutter_ethiopian_date_picker/core/ethiopian_date.dart';
+import 'package:flutter_ethiopian_date_picker/core/ethiopian_date_interop.dart';
+import 'package:flutter_ethiopian_date_picker/core/jdn_converter.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

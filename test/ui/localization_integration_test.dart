@@ -13,7 +13,7 @@
 // unaffected (already covered exactly by date_picker_dialog_test.dart,
 // repeated here for a single coherent locale-focused suite).
 
-import 'package:ethiopian_date_picker/ui/date_picker_dialog.dart';
+import 'package:flutter_ethiopian_date_picker/ui/date_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

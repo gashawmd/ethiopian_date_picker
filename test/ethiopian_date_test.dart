@@ -1,4 +1,4 @@
-import 'package:ethiopian_date_picker/ethiopian_date_picker.dart';
+import 'package:flutter_ethiopian_date_picker/flutter_ethiopian_date_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
