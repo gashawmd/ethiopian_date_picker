@@ -18,6 +18,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  # Task 6.1 — state management smoke tests only. None of these are
+  # runtime dependencies of the package itself.
+  provider: ^6.1.2
+  flutter_riverpod: ^2.5.1
+  flutter_bloc: ^8.1.6
+  bloc: ^8.1.4
+  # Task 6.2 — golden/screenshot tests.
+  golden_toolkit: ^0.15.0
 
 platforms:
   android:
