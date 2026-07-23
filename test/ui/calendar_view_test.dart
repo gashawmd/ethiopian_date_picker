@@ -4,9 +4,6 @@ import 'package:flutter_ethiopian_date_picker/ui/day_cell.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Wraps the widget under test in the minimal scaffolding it needs:
-/// a MaterialApp (for Theme.of/Navigator) and a Scaffold (for Material
-/// ancestor, which InkWell inside EthiopianDayCell requires).
 Widget _wrap(Widget child) {
   return MaterialApp(
     home: Scaffold(body: Center(child: child)),
@@ -36,7 +33,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           EthiopianCalendarView(
-            // 2016 is leap per this package's confirmed rule (year % 4 == 0).
             displayedMonth: EthiopianDate(2016, 13, 1),
             firstDate: EthiopianDate(2000, 1, 1),
             lastDate: EthiopianDate(2020, 13, 6),
@@ -47,8 +43,6 @@ void main() {
       );
 
       expect(find.byType(EthiopianDayCell), findsNWidgets(6));
-      // Confirm day 7 never renders - would indicate an off-by-one in
-      // the Pagume day count.
       expect(find.text('7'), findsNothing);
     });
 
@@ -72,10 +66,6 @@ void main() {
 
     testWidgets('shows correct leading blank cells before day 1',
         (tester) async {
-      // Just confirms the grid renders without throwing across every
-      // month of the year - leading blanks are empty SizedBox.shrink()
-      // widgets, not directly assertable by count, so this is a smoke
-      // test for the weekday-offset math rather than a strict count.
       for (var month = 1; month <= 13; month++) {
         await tester.pumpWidget(
           _wrap(
@@ -110,12 +100,10 @@ void main() {
         ),
       );
 
-      // Day 5 should be disabled (before firstDate).
       await tester.tap(find.text('5'));
       await tester.pump();
       expect(tapped, isNull);
 
-      // Day 15 should be selectable (on/after firstDate).
       await tester.tap(find.text('15'));
       await tester.pump();
       expect(tapped, EthiopianDate(2016, 1, 15));
@@ -130,7 +118,7 @@ void main() {
           EthiopianCalendarView(
             displayedMonth: EthiopianDate(2016, 1, 1),
             firstDate: EthiopianDate(2000, 1, 1),
-            lastDate: EthiopianDate(2016, 1, 10), // days 11-30 disabled
+            lastDate: EthiopianDate(2016, 1, 10),
             onDateSelected: (d) => tapped = d,
             onMonthChanged: (_) {},
           ),
@@ -221,7 +209,7 @@ void main() {
         _wrap(
           EthiopianCalendarView(
             displayedMonth: EthiopianDate(2016, 1, 1),
-            firstDate: EthiopianDate(2016, 1, 1), // nothing before this
+            firstDate: EthiopianDate(2016, 1, 1), 
             lastDate: EthiopianDate(2020, 13, 6),
             onDateSelected: (_) {},
             onMonthChanged: (_) {},
@@ -245,7 +233,7 @@ void main() {
           EthiopianCalendarView(
             displayedMonth: EthiopianDate(2020, 13, 1),
             firstDate: EthiopianDate(2000, 1, 1),
-            lastDate: EthiopianDate(2020, 13, 6), // nothing after this
+            lastDate: EthiopianDate(2020, 13, 6), 
             onDateSelected: (_) {},
             onMonthChanged: (_) {},
           ),
@@ -273,9 +261,7 @@ void main() {
           EthiopianCalendarView(
             displayedMonth: EthiopianDate(today.year, today.month, 1),
             firstDate: EthiopianDate(2000, 1, 1),
-            // Month 12 always has exactly 30 days regardless of leap
-            // status, so this is always a valid upper bound.
-            lastDate: EthiopianDate(2035, 12, 30),
+           lastDate: EthiopianDate(2035, 12, 30),
             onDateSelected: (_) {},
             onMonthChanged: (_) {},
           ),

@@ -28,13 +28,6 @@ Widget _dialogHost({
   );
 }
 
-/// The dialog opens on today's real-world date clamped into
-/// [firstDate, lastDate], NOT on firstDate's month - so tests that
-/// need a known starting month (to make hardcoded day-taps land on
-/// predictable dates) navigate there explicitly rather than assuming
-/// where the dialog happens to open. Taps "Previous month" until it's
-/// disabled, which deterministically lands on firstDate's month
-/// regardless of what today's date is when the test suite runs.
 Future<void> _navigateToFirstDateMonth(WidgetTester tester) async {
   for (var i = 0; i < 20; i++) {
     final Finder tooltipFinder = find.byTooltip('Previous month');
@@ -75,18 +68,15 @@ void main() {
       await tester.tap(find.text('Open range picker'));
       await tester.pumpAndSettle();
 
-      // Before any tap: OK disabled.
       TextButton okButton =
           tester.widget(find.widgetWithText(TextButton, 'OK'));
       expect(okButton.onPressed, isNull);
 
-      // After only the first tap (pending start, no end yet): still disabled.
       await tester.tap(find.text('10'));
       await tester.pump();
       okButton = tester.widget(find.widgetWithText(TextButton, 'OK'));
       expect(okButton.onPressed, isNull);
 
-      // After the second tap (range complete): enabled.
       await tester.tap(find.text('20'));
       await tester.pump();
       okButton = tester.widget(find.widgetWithText(TextButton, 'OK'));
@@ -122,9 +112,9 @@ void main() {
       await tester.pumpAndSettle();
       await _navigateToFirstDateMonth(tester);
 
-      await tester.tap(find.text('10')); // tap start
+      await tester.tap(find.text('10'));
       await tester.pump();
-      await tester.tap(find.text('20')); // tap end
+      await tester.tap(find.text('20'));
       await tester.pump();
 
       await tester.tap(find.text('OK'));
@@ -169,7 +159,6 @@ void main() {
       await tester.pumpAndSettle();
       await _navigateToFirstDateMonth(tester);
 
-      // Tap the LATER date first, then the earlier one.
       await tester.tap(find.text('20'));
       await tester.pump();
       await tester.tap(find.text('10'));
@@ -217,23 +206,18 @@ void main() {
       await tester.pumpAndSettle();
       await _navigateToFirstDateMonth(tester);
 
-      // First complete cycle: 5 -> 15.
       await tester.tap(find.text('5'));
       await tester.pump();
       await tester.tap(find.text('15'));
       await tester.pump();
 
-      // Re-tap: this should RESET, not extend the previous range.
       await tester.tap(find.text('25'));
       await tester.pump();
 
-      // OK should be disabled again - only a new pending start exists.
       final TextButton okAfterReset =
           tester.widget(find.widgetWithText(TextButton, 'OK'));
       expect(okAfterReset.onPressed, isNull);
 
-      // Complete the SECOND cycle: 25 -> ... tap a day in the next
-      // month to also exercise cross-month completion after a reset.
       await tester.tap(find.byTooltip('Next month'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('3'));
@@ -299,11 +283,8 @@ void main() {
       await tester.tap(find.text('Open range picker'));
       await tester.pumpAndSettle();
 
-      // Displayed month should already be Hidar (month 3) 2016 - the
-      // start's month - with no taps needed.
       expect(find.text('Hidar 2016'), findsOneWidget);
 
-      // OK should already be enabled since the range is pre-completed.
       final TextButton okButton =
           tester.widget(find.widgetWithText(TextButton, 'OK'));
       expect(okButton.onPressed, isNotNull);
@@ -331,9 +312,6 @@ void main() {
       await tester.tap(find.text('Open range picker'));
       await tester.pumpAndSettle();
 
-      // Day 5 is before firstDate - tapping it should not set a
-      // pending start (OK should remain disabled with no visible
-      // change to selection state).
       await tester.tap(find.text('5'));
       await tester.pump();
 

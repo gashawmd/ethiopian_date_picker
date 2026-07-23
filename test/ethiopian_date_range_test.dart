@@ -60,8 +60,6 @@ void main() {
     });
 
     test('cross-month range counts correctly', () {
-      // Meskerem 25 -> Tikimt 5: 6 days left in Meskerem (25-30) + 5
-      // days into Tikimt = 11 days inclusive.
       final range = EthiopianDateRange(
         start: EthiopianDate(2016, 1, 25),
         end: EthiopianDate(2016, 2, 5),
@@ -70,9 +68,6 @@ void main() {
     });
 
     test('cross-year range spanning Pagume counts correctly', () {
-      // 2016 is leap -> Pagume 2016 has 6 days.
-      // Pagume 4, 2016 -> Meskerem 3, 2017: days 4,5,6 of Pagume (3
-      // days) + days 1,2,3 of Meskerem (3 days) = 6 days inclusive.
       final range = EthiopianDateRange(
         start: EthiopianDate(2016, 13, 4),
         end: EthiopianDate(2017, 1, 3),
@@ -85,10 +80,6 @@ void main() {
         start: EthiopianDate(2010, 1, 1),
         end: EthiopianDate(2016, 1, 1),
       );
-      // 6 full Ethiopian years apart, inclusive of both endpoints.
-      // Cross-check against julianDayNumber directly rather than
-      // hardcoding an assumed total, since leap-year distribution
-      // across those 6 years affects the exact count.
       final expected = EthiopianDate(2016, 1, 1).julianDayNumber -
           EthiopianDate(2010, 1, 1).julianDayNumber +
           1;

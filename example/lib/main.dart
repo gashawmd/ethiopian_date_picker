@@ -60,8 +60,6 @@ class _HomePageState extends State<HomePage> {
   EthiopianDate? _selectedDate;
   EthiopianDateRange? _selectedRange;
 
-  // EthiopianLocale is the enum used for the UI dropdown; every picker
-  // API takes the raw String code (locale.code), not the enum itself.
   EthiopianLocale _locale = EthiopianLocale.english;
 
   final _formKey = GlobalKey<FormState>();
@@ -69,10 +67,6 @@ class _HomePageState extends State<HomePage> {
 
   bool _useCustomTheme = false;
 
-  /// EthiopianDatePickerTheme has no lightweight constructor — every
-  /// field (including onSelectedColor/todayBorderColor/disabledColor)
-  /// is required, so a custom theme starts from the Material 3 default
-  /// and overrides just the colors we care about.
   EthiopianDatePickerTheme? _resolveTheme(BuildContext context) {
     if (!_useCustomTheme) return null;
     return EthiopianDatePickerTheme.material3(context).copyWith(

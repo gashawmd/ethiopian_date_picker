@@ -30,5 +30,5 @@ final EthiopianLocaleData amLocaleData = EthiopianLocaleData(
   cancelLabel: 'ይቅር',
   previousMonthTooltip: 'ያለፈው ወር',
   nextMonthTooltip: 'የሚቀጥለው ወር',
-  todayLabel: 'ዛሬ', // Confirmed via 2 independent dictionary sources; native-speaker review recommended.
+  todayLabel: 'ዛሬ',
 );

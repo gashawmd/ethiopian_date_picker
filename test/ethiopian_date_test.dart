@@ -30,12 +30,10 @@ void main() {
         () => EthiopianDate(2018, 1, 31),
         throwsA(isA<InvalidCalendarDateException>()),
       );
-      // 2015 is not a leap year -> Pagume only has 5 days.
       expect(
         () => EthiopianDate(2015, 13, 6),
         throwsA(isA<InvalidCalendarDateException>()),
       );
-      // 2016 is a leap year -> Pagume day 6 is valid, day 7 is not.
       expect(
         () => EthiopianDate(2016, 13, 7),
         throwsA(isA<InvalidCalendarDateException>()),

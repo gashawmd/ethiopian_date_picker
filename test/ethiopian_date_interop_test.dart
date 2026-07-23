@@ -11,7 +11,6 @@ void main() {
       final gregorian = DateTime(2023, 9, 12);
       final eth = gregorian.toEthiopianDate();
       expect(eth, isA<EthiopianDate>());
-      // Confirmed against actual implementation: Sept 12, 2023 -> Meskerem 2, 2016.
       expect(eth, EthiopianDate(2016, 1, 2));
     });
 
@@ -76,7 +75,6 @@ void main() {
     });
 
     test('round-trips through actual jsonEncode/jsonDecode', () {
-      // 2016 is leap -> Pagume day 6 is valid.
       final date = EthiopianDate(2016, 13, 6);
       final encoded = jsonEncode(date.toJson());
       final decoded = jsonDecode(encoded) as Map<String, dynamic>;
@@ -101,7 +99,6 @@ void main() {
     });
 
     test('fromJson still enforces calendar validation', () {
-      // month 14 is invalid regardless of JSON shape being correct.
       expect(
         () => EthiopianDate.fromJson({'year': 2016, 'month': 14, 'day': 1}),
         throwsA(isA<InvalidCalendarDateException>()),

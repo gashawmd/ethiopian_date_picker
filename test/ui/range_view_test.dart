@@ -142,8 +142,8 @@ void main() {
 
   group('Cross-month range highlighting (Task 4.2 DoD)', () {
     final crossMonthRange = EthiopianDateRange(
-      start: EthiopianDate(2016, 1, 25), // Meskerem 25
-      end: EthiopianDate(2016, 2, 5), // Tikimt 5
+      start: EthiopianDate(2016, 1, 25), 
+      end: EthiopianDate(2016, 2, 5), 
     );
 
     testWidgets(
@@ -166,10 +166,6 @@ void main() {
       expect(startCell.isRangeStart, isTrue);
       expect(startCell.isRangeEnd, isFalse);
 
-      // Meskerem 30 (last day of the month) is mid-range - it should
-      // be in-range but NOT flagged as the end, since the actual end
-      // (Tikimt 5) lives in the next month. This is what produces an
-      // uncapped band that visually continues off the right edge.
       final lastDayOfMonth = _cellForDay(tester, 30);
       expect(lastDayOfMonth.isInRange, isTrue);
       expect(lastDayOfMonth.isRangeEnd, isFalse);
@@ -182,7 +178,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           EthiopianCalendarView(
-            displayedMonth: EthiopianDate(2016, 2, 1), // Tikimt
+            displayedMonth: EthiopianDate(2016, 2, 1),
             firstDate: EthiopianDate(2000, 1, 1),
             lastDate: EthiopianDate(2020, 12, 30),
             selectedRange: crossMonthRange,
@@ -192,9 +188,6 @@ void main() {
         ),
       );
 
-      // Tikimt 1 (first day of the month) is mid-range - in-range but
-      // NOT flagged as start, since the actual start (Meskerem 25)
-      // lives in the previous month.
       final firstDayOfMonth = _cellForDay(tester, 1);
       expect(firstDayOfMonth.isInRange, isTrue);
       expect(firstDayOfMonth.isRangeStart, isFalse);
@@ -229,10 +222,9 @@ void main() {
   });
 
   group('Cross-year range highlighting (Task 4.2 DoD)', () {
-    // 2016 is leap -> Pagume 2016 has 6 days. Range spans New Year.
     final crossYearRange = EthiopianDateRange(
-      start: EthiopianDate(2016, 13, 4), // Pagume 4, 2016
-      end: EthiopianDate(2017, 1, 3), // Meskerem 3, 2017
+      start: EthiopianDate(2016, 13, 4),
+      end: EthiopianDate(2017, 1, 3),
     );
 
     testWidgets('viewing Pagume 2016: days 4-6 are in-range, day 4 is start',
@@ -253,13 +245,10 @@ void main() {
       final startCell = _cellForDay(tester, 4);
       expect(startCell.isRangeStart, isTrue);
 
-      // Day 6 is Pagume's last day in this leap year - mid-range, no
-      // end cap, since the range continues into 2017's Meskerem.
       final lastPagumeDay = _cellForDay(tester, 6);
       expect(lastPagumeDay.isInRange, isTrue);
       expect(lastPagumeDay.isRangeEnd, isFalse);
 
-      // Day 1-3 of Pagume are before the range starts.
       final beforeStart = _cellForDay(tester, 1);
       expect(beforeStart.isInRange, isFalse);
     });
@@ -311,12 +300,9 @@ void main() {
         ),
       );
 
-      // day 20 (selectedDate) should NOT show as selected, since
-      // selectedRange is active.
       final ignoredSelectedDate = _cellForDay(tester, 20);
       expect(ignoredSelectedDate.isSelected, isFalse);
 
-      // The range's own start/end still render correctly.
       final startCell = _cellForDay(tester, 5);
       expect(startCell.isRangeStart, isTrue);
     });

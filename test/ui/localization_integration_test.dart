@@ -1,18 +1,3 @@
-// test/ui/localization_integration_test.dart
-//
-// Task 5.1 DoD (widget-level): "Switching locale updates all visible text
-// with no missing-key fallback errors" — proven through the actual
-// showEthiopianDatePicker() dialog, not just raw locale-data lookups.
-//
-// Deliberately does NOT assert on specific translated strings (e.g. the
-// am/om/ti OK/CANCEL labels) since those live in locale data files this
-// test doesn't have visibility into — asserting on guessed text would
-// just reintroduce the same problem in a different form. Instead this
-// checks structural properties: the dialog renders, its full text
-// content changes between locales, and the English/default path is
-// unaffected (already covered exactly by date_picker_dialog_test.dart,
-// repeated here for a single coherent locale-focused suite).
-
 import 'package:flutter_ethiopian_date_picker/ui/date_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -39,8 +24,6 @@ Future<void> _openDialog(WidgetTester tester, {String? locale}) async {
   await tester.pumpAndSettle();
 }
 
-/// All visible text currently in the tree, as a set (order doesn't
-/// matter for the comparisons below).
 Set<String> _visibleTexts(WidgetTester tester) {
   return find
       .byType(Text)
@@ -70,10 +53,6 @@ void main() {
       await _openDialog(tester, locale: null);
 
       expect(find.byType(Dialog), findsOneWidget);
-      // Confirmed via diagnostic dump: the actual rendered label is
-      // 'Cancel' (title case), not 'CANCEL'. Note: this differs from
-      // what test/ui/date_picker_dialog_test.dart currently asserts —
-      // worth reconciling separately, see conversation notes.
       expect(find.text('OK'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
     });

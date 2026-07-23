@@ -5,22 +5,6 @@ import '../core/ethiopian_date_interop.dart';
 import '../theme/picker_theme.dart';
 import 'date_picker_dialog.dart';
 
-/// An optional controller for [EthiopianDateFormField] that switches the
-/// field from its default tap-to-open behavior into typed-entry mode.
-///
-/// Mirrors [TextEditingController] in spirit: owns the underlying
-/// [TextEditingController] used for keyboard entry, keeps it in sync with
-/// a parsed [EthiopianDate] value, and must be [dispose]d by whoever
-/// creates it — [EthiopianDateFormField] never disposes a controller it
-/// didn't create itself, matching how [TextFormField] treats externally
-/// supplied [TextEditingController]s.
-///
-/// Parsing currently only supports the default `yyyy-MM-dd` layout (the
-/// same default as [EthiopianDateFormatting.format] and
-/// [EthiopianDate.toString]). Text that doesn't parse to a valid
-/// [EthiopianDate] simply leaves [value] as `null` rather than throwing —
-/// the field's own [FormFieldValidator] is the right place to surface
-/// "please enter a valid date" style errors to the user.
 class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
   EthiopianDateEditingController({EthiopianDate? initialValue})
       : _textController = TextEditingController(
@@ -31,13 +15,7 @@ class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
   }
 
   final TextEditingController _textController;
-
-  /// The underlying text controller, exposed for the rare case a caller
-  /// needs to attach a [FocusNode] or read selection state directly.
   TextEditingController get textController => _textController;
-
-  /// Convenience accessor for the current raw text, equivalent to
-  /// `textController.text`.
   String get text => _textController.text;
   set text(String newText) => _textController.text = newText;
 
@@ -70,9 +48,6 @@ class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
     try {
       return EthiopianDate(year, month, day);
     } catch (_) {
-      // Invalid combination (e.g. month 14, or day 30 in a non-leap
-      // Pagume) — treated as "not yet a valid date" rather than a
-      // crash; the field's validator surfaces this to the user.
       return null;
     }
   }
@@ -85,24 +60,6 @@ class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
   }
 }
 
-/// An [EthiopianDate] field compatible with [Form]/[FormState], matching
-/// the shape of Flutter's own [TextFormField] closely enough to drop into
-/// existing forms with minimal friction.
-///
-/// **Default behavior (no [controller]):** a read-only, tap-to-open field.
-/// Tapping it — or focusing it via keyboard/switch-access and activating —
-/// opens [showEthiopianDatePicker]. This is the recommended mode for most
-/// consumers: typed Ethiopian-date entry is easy to get subtly wrong (13
-/// months, Pagume's 5/6-day range), so tap-to-open avoids that failure
-/// surface entirely.
-///
-/// **Typed-entry mode:** pass an [EthiopianDateEditingController] to let
-/// users type a date directly (`yyyy-MM-dd`), with a calendar-icon button
-/// still available to open the picker as an alternative input path.
-///
-/// DoD: works inside a standard [Form], validated via
-/// `formKey.currentState.validate()` — [validator] and [onSaved] are
-/// forwarded to the underlying [FormField] unchanged.
 class EthiopianDateFormField extends FormField<EthiopianDate> {
   EthiopianDateFormField({
     super.key,
@@ -132,30 +89,12 @@ class EthiopianDateFormField extends FormField<EthiopianDate> {
           },
         );
 
-  /// Lower bound passed through to [showEthiopianDatePicker].
   final EthiopianDate? firstDate;
-
-  /// Upper bound passed through to [showEthiopianDatePicker].
   final EthiopianDate? lastDate;
-
-  /// Locale code passed through to [showEthiopianDatePicker]; falls back
-  /// to English for `null`/unsupported codes, same as the dialog itself.
   final String? locale;
-
-  /// Visual theme passed through to [showEthiopianDatePicker].
   final EthiopianDatePickerTheme? theme;
-
-  /// Decoration for the field's [InputDecorator]/[TextField], following
-  /// the same conventions as [TextFormField.decoration].
   final InputDecoration decoration;
-
-  /// When supplied, switches the field into typed-entry mode. See the
-  /// class doc comment for the behavioral difference.
   final EthiopianDateEditingController? controller;
-
-  /// Called whenever the selected date changes, whether via typing,
-  /// tapping the calendar icon, or (in tap-to-open mode) the field
-  /// itself.
   final ValueChanged<EthiopianDate?>? onChanged;
 }
 

@@ -18,7 +18,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           EthiopianDatePickerDialog(
-            // Deliberately before firstDate.
             initialDate: EthiopianDate(2000, 1, 1),
             firstDate: EthiopianDate(2016, 1, 1),
             lastDate: EthiopianDate(2020, 12, 30),
@@ -26,19 +25,10 @@ void main() {
         ),
       );
 
-      // The displayed month should reflect the clamped date (2016-01),
-      // not the raw out-of-range initialDate (2000-01).
       expect(find.text('Meskerem 2016'), findsOneWidget);
 
-      // Confirming immediately (no further interaction) should return
-      // the clamped date, not the original out-of-range one.
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
-      // Dialog is gone; nothing further to assert here directly, but
-      // the fact that it didn't throw during initState is itself part
-      // of the DoD - an unclamped out-of-range initialDate would have
-      // produced a display state the calendar can't represent as
-      // "selected" within the visible range.
     });
 
     testWidgets(
@@ -47,7 +37,6 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           EthiopianDatePickerDialog(
-            // Deliberately after lastDate.
             initialDate: EthiopianDate(2030, 1, 1),
             firstDate: EthiopianDate(2016, 1, 1),
             lastDate: EthiopianDate(2020, 12, 30),
@@ -79,7 +68,7 @@ void main() {
       expect(
         () => EthiopianDatePickerDialog(
           initialDate: EthiopianDate(2016, 1, 1),
-          firstDate: EthiopianDate(2020, 1, 1), // after lastDate
+          firstDate: EthiopianDate(2020, 1, 1),
           lastDate: EthiopianDate(2016, 1, 1),
         ),
         throwsAssertionError,
@@ -153,7 +142,6 @@ void main() {
       );
 
       expect(tester.takeException(), isNull);
-      // Falls back to English month names.
       expect(find.text('Meskerem 2016'), findsOneWidget);
     });
 

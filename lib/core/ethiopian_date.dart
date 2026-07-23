@@ -71,15 +71,8 @@ class EthiopianDate implements Comparable<EthiopianDate> {
   @override
   int compareTo(EthiopianDate other) =>
       julianDayNumber.compareTo(other.julianDayNumber);
-
-  /// True if this date is strictly before [other].
   bool isBefore(EthiopianDate other) => compareTo(other) < 0;
-
-  /// True if this date is strictly after [other].
   bool isAfter(EthiopianDate other) => compareTo(other) > 0;
-
-  /// True if this date represents the same day as [other]. Equivalent to
-  /// `==` for [EthiopianDate], provided for symmetry with `DateTime`'s API.
   bool isAtSameMomentAs(EthiopianDate other) => compareTo(other) == 0;
 
   @override

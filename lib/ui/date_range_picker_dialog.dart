@@ -9,26 +9,6 @@ import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
 
-/// Shows a modal dialog for picking an [EthiopianDateRange] via a
-/// tap-start / tap-end interaction: the first tap sets the range's
-/// start, the second tap sets its end (auto-swapped into `start <=
-/// end` order if tapped out of order), and tapping again after the
-/// range is complete resets and starts a new selection.
-///
-/// Returns the completed range once OK is pressed, or `null` if the
-/// dialog is dismissed or cancelled. OK stays disabled until a full
-/// range has been picked - a single pending start isn't enough to
-/// confirm.
-///
-/// All parameters besides [context] are optional:
-/// ```dart
-/// final range = await showEthiopianDateRangePicker(context: context);
-/// ```
-///
-/// Uses the same `showGeneralDialog`-based fade+scale entrance/exit
-/// as [showEthiopianDatePicker] (Task 4.1), and the same
-/// `firstDate > lastDate` debug assertion and locale-fallback
-/// behavior as the single-date dialog (Task 2.3).
 Future<EthiopianDateRange?> showEthiopianDateRangePicker({
   required BuildContext context,
   EthiopianDateRange? initialRange,
@@ -76,16 +56,6 @@ Future<EthiopianDateRange?> showEthiopianDateRangePicker({
   );
 }
 
-/// The dialog widget itself, exposed publicly for callers who want to
-/// embed it directly rather than go through
-/// [showEthiopianDateRangePicker] (same rationale as
-/// [EthiopianDatePickerDialog] - going this route skips the built-in
-/// fade+scale transition, which lives in the `showGeneralDialog` call
-/// above, not in this widget).
-///
-/// Accessibility (Task 5.3): same as [EthiopianDatePickerDialog] -
-/// Escape closes the dialog via [CallbackShortcuts], and both action
-/// buttons carry an explicit 48x48 minimum tap target.
 class EthiopianDateRangePickerDialog extends StatefulWidget {
   EthiopianDateRangePickerDialog({
     super.key,
@@ -100,21 +70,13 @@ class EthiopianDateRangePickerDialog extends StatefulWidget {
           'be after lastDate ($lastDate).',
         );
 
-  /// Optional pre-existing range to seed the dialog with (e.g. editing
-  /// a previously-picked range). Both endpoints are independently
-  /// clamped into `[firstDate, lastDate]`, same defensive philosophy
-  /// as the single-date dialog's `initialDate` clamping (Task 2.3).
   final EthiopianDateRange? initialRange;
 
   final EthiopianDate firstDate;
   final EthiopianDate lastDate;
-
-  /// Optional locale code, forwarded to [EthiopianCalendarView]. See
-  /// [EthiopianCalendarHeader.resolveLocale] for fallback behavior.
   final String? locale;
 
   /// Optional visual theme. Falls back to
-  /// [EthiopianDatePickerTheme.material3] when omitted.
   final EthiopianDatePickerTheme? theme;
 
   @override
@@ -133,10 +95,6 @@ class _EthiopianDateRangePickerDialogState
     final EthiopianDateRange? initial = widget.initialRange;
 
     if (initial != null) {
-      // Clamp is monotonic, so clamping each endpoint independently
-      // can never invert their order - clampedStart <= clampedEnd is
-      // still guaranteed even if the original range fell entirely
-      // outside [firstDate, lastDate].
       final EthiopianDate clampedStart = EthiopianDateUtils.clamp(
         initial.start,
         min: widget.firstDate,
@@ -224,8 +182,6 @@ class _EthiopianDateRangePickerDialogState
                   ),
                   SizedBox(width: resolvedTheme.spacing.sm),
                   TextButton(
-                    // Disabled until a full range is picked - a single
-                    // pending start isn't a confirmable selection.
                     onPressed: _selection.isComplete ? _handleOk : null,
                     style: TextButton.styleFrom(
                       foregroundColor: resolvedTheme.primaryColor,

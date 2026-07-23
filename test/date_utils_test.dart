@@ -12,8 +12,6 @@ void main() {
     });
 
     test('Pagume (month 13) has 6 days in a leap year', () {
-      // Confirmed: this implementation treats year % 4 == 0 as leap.
-      // 2016 % 4 == 0 -> Pagume 2016 has 6 days.
       expect(EthiopianDateUtils.daysInMonth(2016, 13), 6);
     });
 
@@ -53,9 +51,8 @@ void main() {
     });
 
     test('crosses a year boundary correctly', () {
-      // 2015 is non-leap -> Pagume 2015 has 5 days.
       final from = EthiopianDate(2015, 13, 1);
-      final to = EthiopianDate(2016, 1, 1); // Meskerem 1, next year
+      final to = EthiopianDate(2016, 1, 1);
       expect(EthiopianDateUtils.daysBetween(from, to), 5);
     });
 

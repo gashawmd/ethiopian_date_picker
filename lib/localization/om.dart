@@ -1,6 +1,5 @@
 import 'ethiopian_locale.dart';
 
-/// Afaan Oromo localization data for the Ethiopian calendar.
 final EthiopianLocaleData omLocaleData = EthiopianLocaleData(
   languageCode: 'om',
   monthNames: [

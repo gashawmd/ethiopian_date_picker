@@ -15,14 +15,11 @@ void main() {
     });
 
     test('rolls over Pagume into next year (non-leap)', () {
-      // 2015 is non-leap -> Pagume 2015 has 5 days.
       final date = EthiopianDate(2015, 13, 3);
       expect(date.addDays(3), EthiopianDate(2016, 1, 1));
     });
 
     test('negative days moves backward across a year boundary', () {
-      // The day before Meskerem 1, 2016 is Pagume of year 2015.
-      // 2015 is non-leap, so its last Pagume day is day 5.
       final date = EthiopianDate(2016, 1, 1);
       expect(date.addDays(-1), EthiopianDate(2015, 13, 5));
     });
@@ -35,13 +32,11 @@ void main() {
     });
 
     test('rolls over into Pagume within the same year', () {
-      // 2016 is leap -> Pagume 2016 has 6 days, so day 10 clamps to 6.
       final date = EthiopianDate(2016, 12, 10);
       expect(date.addMonths(1), EthiopianDate(2016, 13, 6));
     });
 
     test('clamps day when landing on a shorter month (Pagume, non-leap)', () {
-      // 2015 is non-leap -> Pagume 2015 has 5 days.
       final date = EthiopianDate(2015, 12, 30);
       final result = date.addMonths(1);
       expect(result.month, 13);
@@ -63,7 +58,6 @@ void main() {
     });
 
     test('clamps Pagume day 6 down when landing in a non-leap year', () {
-      // 2016 is leap (Pagume day 6 valid) -> 2017 is non-leap (max day 5).
       final date = EthiopianDate(2016, 13, 6);
       final result = date.addYears(1);
       expect(result.year, 2017);

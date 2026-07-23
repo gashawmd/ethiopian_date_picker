@@ -1,29 +1,6 @@
-// Task 6.1 — State Management Compatibility
-//
-// EthiopianCalendarView is stateless and fully controlled (see its doc
-// comment): it owns no state of its own, just renders whatever
-// displayedMonth/selectedDate it's given and reports taps upward via
-// callbacks. That makes "compatibility" with Provider/Riverpod/Bloc a
-// question of whether *external* state correctly drives the widget and
-// receives updates back — not whether the widget has special integration
-// with any of them.
-//
-// Each group below wires the same EthiopianCalendarView to a different
-// state-management approach and verifies a tap flows external state ->
-// widget rebuild -> external state, round-trip. The final group is the
-// actual "no internal global/static mutable state" check: two sibling
-// instances, each with independent external state, must not leak into one
-// another when driven simultaneously.
-//
-// Run: flutter pub add --dev provider flutter_riverpod flutter_bloc
-//      flutter test test/state_management_smoke_test.dart
-
 import 'package:flutter_ethiopian_date_picker/flutter_ethiopian_date_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-// flutter_riverpod and provider both export ChangeNotifierProvider and
-// Consumer with different signatures — prefix riverpod's import so the
-// two packages can coexist in one file without an ambiguous_import error.
 import 'package:flutter_riverpod/flutter_riverpod.dart' as riverpod;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -72,10 +49,7 @@ void main() {
       await tester.tap(find.text('15'));
       await tester.pumpAndSettle();
 
-      // State changed outside the widget...
       expect(holder.date, _kTappedDate);
-      // ...and the widget rebuilt to reflect it (day 15 now shows as
-      // the filled/selected cell — day 10, the old selection, doesn't).
       expect(find.text('15'), findsOneWidget);
     });
   });
@@ -180,7 +154,6 @@ void main() {
         ),
       );
 
-      // Tap day 15 only inside instance A.
       await tester.tap(
         find.descendant(
           of: find.byKey(const Key('instance-a')),
@@ -190,9 +163,6 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(holderA.date, _kTappedDate);
-      // B was never touched — if EthiopianCalendarView (or anything it
-      // depends on) held mutable state in a static/global, this would
-      // now unexpectedly equal _kTappedDate too.
       expect(holderB.date, _kInitialDate);
     });
   });

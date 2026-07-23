@@ -6,34 +6,23 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('JdnConverter round-trip (Task 1.2 DoD)', () {
     test('verified real-world anchor dates convert exactly', () {
-      // Ethiopian New Year 2016 E.C. == 11 September 2023 (Gregorian).
-      // Well-corroborated across independent, recent sources.
       YMD g = JdnConverter.jdnToGregorian(
         JdnConverter.ethiopianToJdn(2016, 1, 1),
       );
       expect([g.year, g.month, g.day], [2023, 9, 11]);
 
-      // Live converter anchor: 16 July 2026 (Gregorian) == Hamle 9,
-      // 2018 E.C.
       final YMD e = JdnConverter.jdnToEthiopian(
         JdnConverter.gregorianToJdn(2026, 7, 16),
       );
       expect([e.year, e.month, e.day], [2018, 11, 9]);
 
-      // Ethiopian New Year 2017 E.C. == 11 September 2024 (leap
-      // Gregorian year, but the Ethiopian leap day already fell inside
-      // EC 2016, so the two stay in sync at Sept 11).
       g = JdnConverter.jdnToGregorian(JdnConverter.ethiopianToJdn(2017, 1, 1));
       expect([g.year, g.month, g.day], [2024, 9, 11]);
     });
 
     test('100+ generated known pairs round-trip via both directions', () {
-      // Generate 120 reference pairs by walking forward from a verified
-      // anchor (EC 2016-01-01 == 2023-09-11) in fixed day steps, and
-      // independently re-deriving the Gregorian side with Dart's own
-      // DateTime, which is ground truth for Gregorian arithmetic.
       final DateTime anchorGregorian = DateTime(2023, 9, 11);
-      const int anchorJdn0 = 0; // relative day offset marker
+      const int anchorJdn0 = 0;
       var pairsChecked = 0;
       for (int i = -60; i < 60; i++) {
         final DateTime g = anchorGregorian.add(Duration(days: i));
@@ -50,7 +39,7 @@ void main() {
         expect(gBack.day, g.day);
         pairsChecked++;
       }
-      expect(anchorJdn0, 0); // sanity no-op, keeps analyzer happy
+      expect(anchorJdn0, 0);
       expect(pairsChecked, greaterThanOrEqualTo(100));
     });
 
@@ -59,9 +48,9 @@ void main() {
       const int sampleCount = 10000;
       var mismatches = 0;
       for (int i = 0; i < sampleCount; i++) {
-        final int year = 1700 + random.nextInt(500); // spans centuries
+        final int year = 1700 + random.nextInt(500); 
         final int month = 1 + random.nextInt(12);
-        final DateTime probe = DateTime(year, month + 1, 0); // last day
+        final DateTime probe = DateTime(year, month + 1, 0); 
         final int day = 1 + random.nextInt(probe.day);
 
         final int jdn = JdnConverter.gregorianToJdn(year, month, day);
@@ -105,11 +94,11 @@ void main() {
         2013: 5,
         2014: 5,
         2015: 5,
-        2016: 6, // leap
+        2016: 6,
         2017: 5,
         2018: 5,
         2019: 5,
-        2020: 6, // leap
+        2020: 6, 
       };
       expected.forEach((year, days) {
         expect(

@@ -14,17 +14,13 @@ Widget _wrap(Widget child, {ThemeData? appTheme}) {
   );
 }
 
-/// A deliberately unusual custom theme - colors and text styles picked
-/// specifically so they can't be confused with typical Material 3
-/// defaults, making it easy to assert "the custom theme was actually
-/// applied" rather than "something vaguely blue showed up".
 EthiopianDatePickerTheme _customTheme() {
   return const EthiopianDatePickerTheme(
-    primaryColor: Color(0xFFFF00FF), // magenta
-    selectedColor: Color(0xFF00FF00), // green
-    backgroundColor: Color(0xFF000033), // near-black navy
+    primaryColor: Color(0xFFFF00FF),
+    selectedColor: Color(0xFF00FF00),
+    backgroundColor: Color(0xFF000033),
     onSelectedColor: Color(0xFF111111),
-    todayBorderColor: Color(0xFFFFAA00), // orange
+    todayBorderColor: Color(0xFFFFAA00),
     disabledColor: Color(0xFF888888),
     spacing: EthiopianDatePickerSpacing(xs: 2, sm: 6, md: 12, lg: 20),
     typography: EthiopianDatePickerTypography(
@@ -90,7 +86,6 @@ void main() {
       expect(spacing.sm, 8);
       expect(spacing.md, 16);
       expect(spacing.lg, 24);
-      // xs is the one sub-8px value, used for tight cell padding.
       expect(spacing.xs, 4);
     });
   });
@@ -238,7 +233,6 @@ void main() {
       final tweaked = base.copyWith(primaryColor: Colors.cyan);
 
       expect(tweaked.primaryColor, Colors.cyan);
-      // Everything else carried over unchanged.
       expect(tweaked.selectedColor, base.selectedColor);
       expect(tweaked.backgroundColor, base.backgroundColor);
       expect(tweaked.spacing, base.spacing);

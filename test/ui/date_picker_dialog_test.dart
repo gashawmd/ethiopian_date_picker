@@ -3,8 +3,6 @@ import 'package:flutter_ethiopian_date_picker/ui/date_picker_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// A minimal host app with a button that opens the picker and displays
-/// whatever it returns, so tests can drive the whole flow end-to-end.
 class _TestHost extends StatefulWidget {
   const _TestHost({
     this.initialDate,
@@ -68,7 +66,6 @@ void main() {
       await tester.tap(find.text('Open picker'));
       await tester.pumpAndSettle();
 
-      // The dialog should now be showing.
       expect(find.byType(Dialog), findsOneWidget);
       expect(find.text('OK'), findsOneWidget);
       expect(find.text('Cancel'), findsOneWidget);
@@ -76,7 +73,6 @@ void main() {
       await tester.tap(find.text('OK'));
       await tester.pumpAndSettle();
 
-      // Defaults to today's date when nothing else is specified.
       expect(find.text(EthiopianDate.today().toString()), findsOneWidget);
     });
 
@@ -99,7 +95,6 @@ void main() {
       await tester.tap(find.text('Open picker'));
       await tester.pumpAndSettle();
 
-      // Tap the scrim outside the dialog content.
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
 
@@ -119,7 +114,6 @@ void main() {
       await tester.tap(find.text('Open picker'));
       await tester.pumpAndSettle();
 
-      // Month 5 is Tir.
       expect(find.text('Tir 2016'), findsOneWidget);
 
       await tester.tap(find.text('OK'));
@@ -155,16 +149,14 @@ void main() {
       await tester.pumpWidget(
         _TestHost(
           initialDate: EthiopianDate(2016, 1, 15),
-          firstDate: EthiopianDate(2016, 1, 10), // days 1-9 disabled
-          lastDate: EthiopianDate(2016, 1, 20), // days 21-30 disabled
+          firstDate: EthiopianDate(2016, 1, 10),
+          lastDate: EthiopianDate(2016, 1, 20),
         ),
       );
 
       await tester.tap(find.text('Open picker'));
       await tester.pumpAndSettle();
 
-      // Day 5 is out of range - tapping it should not change the
-      // selection, so confirming still returns the seeded initialDate.
       await tester.tap(find.text('5'));
       await tester.pump();
 
@@ -190,16 +182,10 @@ void main() {
       expect(find.text('Meskerem 2016'), findsOneWidget);
 
       await tester.tap(find.byTooltip('Next month'));
-      // pumpAndSettle (not a single pump()) because Task 4.1 added a
-      // real slide/fade transition on month change - a bare pump()
-      // would catch the grid mid-transition, where both the outgoing
-      // and incoming month's day cells briefly coexist in the tree,
-      // making find.text('3') below ambiguous.
       await tester.pumpAndSettle();
 
       expect(find.text('Tikimt 2016'), findsOneWidget);
 
-      // Selecting a day after navigating should reflect the new month.
       await tester.tap(find.text('3'));
       await tester.pump();
 

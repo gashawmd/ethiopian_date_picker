@@ -4,9 +4,6 @@ import 'package:flutter_ethiopian_date_picker/ui/form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// A minimal host: a Form containing one EthiopianDateFormField plus a
-/// submit button that runs validate() then save(), recording the saved
-/// value so tests can assert on it.
 class _TestHost extends StatefulWidget {
   const _TestHost({
     this.initialValue,
@@ -130,8 +127,6 @@ void main() {
       await tester.tap(find.byType(InputDecorator));
       await tester.pumpAndSettle();
 
-      // The picker dialog should now be open, seeded at the field's
-      // current value (Tir 2016).
       expect(find.text('Tir 2016'), findsOneWidget);
 
       await tester.tap(find.text('20'));

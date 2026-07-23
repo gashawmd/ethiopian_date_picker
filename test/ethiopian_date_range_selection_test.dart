@@ -50,7 +50,6 @@ void main() {
         () {
       final afterFirstTap = const EthiopianDateRangeSelection.empty()
           .select(EthiopianDate(2016, 1, 20));
-      // Second tap is BEFORE the first - user tapped out of order.
       final completed = afterFirstTap.select(EthiopianDate(2016, 1, 10));
 
       expect(completed.isComplete, isTrue);
@@ -139,7 +138,6 @@ void main() {
           end: EthiopianDate(2016, 5, 10),
         ),
       );
-      // The first range is fully gone, not merged or remembered.
       expect(secondCycle.completedRange, isNot(firstRange.completedRange));
     });
 

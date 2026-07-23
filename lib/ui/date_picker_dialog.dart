@@ -7,39 +7,6 @@ import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
 
-/// Shows a modal dialog containing an [EthiopianCalendarView] plus
-/// Cancel/OK actions, returning the selected date once OK is pressed,
-/// or `null` if the dialog is dismissed or cancelled.
-///
-/// Mirrors the signature and behavior of Flutter's built-in
-/// `showDatePicker()`: [initialDate] seeds the initial selection (and
-/// displayed month), while [firstDate]/[lastDate] bound the selectable
-/// range (both inclusive).
-///
-/// All parameters besides [context] are optional, so this works with
-/// zero other configuration:
-/// ```dart
-/// final date = await showEthiopianDatePicker(context: context);
-/// ```
-///
-/// Pass [theme] to override colors, spacing, or typography; omit it
-/// and the picker matches the ambient Material 3 app theme.
-///
-/// Built on [showGeneralDialog] rather than [showDialog] (Task 4.1) so
-/// the dialog's entrance/exit gets an explicit fade+scale transition,
-/// rather than relying on whatever transition (if any) the platform's
-/// default route happens to apply. `barrierDismissible`/`barrierColor`
-/// are set to match `showDialog`'s own defaults, so tap-outside-to-
-/// dismiss behavior is unchanged from before this task.
-///
-/// Error handling (see [EthiopianDatePickerDialog] for details):
-/// - `initialDate` outside `[firstDate, lastDate]` is silently clamped
-///   into range rather than throwing or producing an unselectable
-///   initial state.
-/// - `firstDate > lastDate` is a programmer error, caught by a debug
-///   assertion with a clear message; it is not silently tolerated.
-/// - An unsupported/missing [locale] falls back to English rather than
-///   throwing.
 Future<EthiopianDate?> showEthiopianDatePicker({
   required BuildContext context,
   EthiopianDate? initialDate,
@@ -89,30 +56,6 @@ Future<EthiopianDate?> showEthiopianDatePicker({
   );
 }
 
-/// The dialog widget itself, exposed publicly in case callers want to
-/// embed it directly (e.g. inside a custom bottom sheet) rather than
-/// go through [showEthiopianDatePicker]. Note that going this route
-/// bypasses the fade+scale entrance/exit transition described above -
-/// that animation lives in [showEthiopianDatePicker]'s use of
-/// `showGeneralDialog`, not in this widget itself, since a widget
-/// can't animate its own route transition.
-///
-/// Error handling:
-/// - A debug-mode [assert] catches `firstDate > lastDate` misconfig
-///   with a clear message, matching how Flutter's own `DatePickerDialog`
-///   validates its own `firstDate`/`lastDate`. This is a programmer
-///   error - it should fail loudly in development, not be silently
-///   "handled" in a way that hides the bug. It is stripped in release
-///   builds, same as any other Dart `assert`.
-/// - `initialDate` outside `[firstDate, lastDate]` is a much more
-///   common, easy-to-hit mistake (e.g. a stored "last picked date" that
-///   predates a newly-tightened `firstDate`), so rather than asserting
-///   on it, it's silently clamped into range via
-///   [EthiopianDateUtils.clamp].
-///
-/// Accessibility (Task 5.3): the dialog binds Escape to close itself
-/// via [CallbackShortcuts], and both action buttons carry an explicit
-/// 48x48 minimum tap target.
 class EthiopianDatePickerDialog extends StatefulWidget {
   EthiopianDatePickerDialog({
     super.key,
@@ -131,13 +74,10 @@ class EthiopianDatePickerDialog extends StatefulWidget {
   final EthiopianDate firstDate;
   final EthiopianDate lastDate;
 
-  /// Optional locale code, forwarded to [EthiopianCalendarView]. See
-  /// [EthiopianCalendarHeader.resolveLocale] for fallback behavior -
-  /// an unrecognized code never throws, it just falls back to English.
+  /// it just falls back to English.
   final String? locale;
 
   /// Optional visual theme. Falls back to
-  /// [EthiopianDatePickerTheme.material3] when omitted.
   final EthiopianDatePickerTheme? theme;
 
   @override
@@ -152,11 +92,6 @@ class _EthiopianDatePickerDialogState extends State<EthiopianDatePickerDialog> {
   @override
   void initState() {
     super.initState();
-    // Defensive clamp: even if showEthiopianDatePicker() didn't clamp
-    // (or this widget is constructed directly, bypassing that
-    // function), an out-of-range initialDate is silently pulled back
-    // into [firstDate, lastDate] rather than producing an initial
-    // selection the calendar would refuse to render as selected.
     _selectedDate = EthiopianDateUtils.clamp(
       widget.initialDate,
       min: widget.firstDate,

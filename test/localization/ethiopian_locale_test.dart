@@ -16,8 +16,6 @@ Widget _dialogHost({String? locale}) {
           builder: (context) => ElevatedButton(
             onPressed: () => showEthiopianDatePicker(
               context: context,
-              // Fixed date so the displayed month is deterministic
-              // across every locale, regardless of when the test runs.
               initialDate: EthiopianDate(2016, 1, 1),
               locale: locale,
             ),
@@ -29,9 +27,6 @@ Widget _dialogHost({String? locale}) {
   );
 }
 
-/// Minimal wrapper exposing just a localized month label at a fixed
-/// month, used to test locale-switch-on-rebuild in isolation from the
-/// full dialog.
 class _LocalizedMonthLabel extends StatelessWidget {
   const _LocalizedMonthLabel({required this.locale});
 
@@ -65,14 +60,11 @@ void main() {
         await tester.tap(find.text('Open picker'));
         await tester.pumpAndSettle();
 
-        // Header shows this locale's name for month 1 (Meskerem).
         expect(
           find.text('${data.monthNames[0]} 2016'),
           findsOneWidget,
           reason: '$code header month name not shown',
         );
-
-        // Every weekday label for this locale appears exactly once.
         for (final weekday in data.weekdayNamesShort) {
           expect(
             find.text(weekday),
@@ -81,13 +73,10 @@ void main() {
           );
         }
 
-        // OK/CANCEL buttons show this locale's labels.
         expect(find.text(data.okLabel), findsOneWidget,
             reason: '$code OK label not shown');
         expect(find.text(data.cancelLabel), findsOneWidget,
             reason: '$code CANCEL label not shown');
-
-        // No missing-key/rendering exceptions for this locale.
         expect(tester.takeException(), isNull);
       });
 
@@ -122,8 +111,6 @@ void main() {
         ),
       );
       await tester.pump();
-
-      // Old English text is gone, new Amharic text is present.
       expect(find.text('Meskerem 2016'), findsNothing);
       expect(find.text('${amLocaleData.monthNames[0]} 2016'), findsOneWidget);
     });
