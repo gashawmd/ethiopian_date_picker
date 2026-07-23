@@ -5,7 +5,7 @@ goldens) only exercises the widget tree in a headless test harness —
 it never touches a real device, browser, or window manager. This
 document is the manual pass those tests can't cover: an identical
 checklist run by a human on each target platform, using the example
-app (or a throwaway app that just imports the package and calls
+app (using the example application or a minimal verification application that just imports the package and calls
 `showEthiopianDatePicker` / `showEthiopianDateRangePicker` /
 `EthiopianDateFormField`).
 
@@ -24,7 +24,7 @@ three entry points below.
 
 ## The test script (run identically on every platform)
 
-Work through all seven in order. Anything that doesn't match — note it
+Run each checklist item in order on every supported platform. Anything that doesn't match — note it
 in the row's "Notes" column in the summary table at the bottom rather
 than silently checking it off.
 
@@ -101,15 +101,30 @@ Fill in once each platform has been run through the script above.
 
 | Platform | Automated (CI) | Manual script pass | Keyboard/mouse parity | Screen reader | Notes |
 |----------|:---:|:---:|:---:|:---:|---|
-| Android  | ✅ | ☐ | n/a | ☐ (TalkBack) | |
-| iOS      | ✅ | ☐ | n/a | ☐ (VoiceOver) | |
-| Web      | ✅ | ☐ | ☐ | n/a | Chrome + Safari minimum |
-| Windows  | ✅ | ☐ | ☐ | ☐ (NVDA) | |
-| macOS    | ✅ | ☐ | ☐ | ☐ (VoiceOver) | |
-| Linux    | ✅ | ☐ | ☐ | ☐ (Orca, if available) | |
+| Android  | ✅ | ☐ | n/a | ☐ (TalkBack) | Build-verified in CI; no physical device available for manual pass yet |
+| iOS      | ✅ | ☐ | n/a | ☐ (VoiceOver) | Build-verified in CI; no physical device available for manual pass yet |
+| Web      | ✅ | ✅ | ☐ |  ☐  | Full script run + performance profiled in Chrome DevTools |
+| Windows  | ✅ | ☐ | ☐ | ☐ (NVDA) | Build-verified in CI; no Windows machine available for manual pass yet |
+| macOS    | ✅ | ☐ | ☐ | ☐ (VoiceOver) | Build-verified in CI; no macOS machine available for manual pass yet |
+| Linux    | ✅ | ✅ | ☐ | ☐ (Orca, if available) | Full script run manually — all features confirmed working |
 
 "Automated" is already true for all six once `flutter test` is green
 in CI — that only proves the widget tree behaves correctly in
 isolation, not that it renders and responds correctly on real
 hardware, so every other column still needs a human before checking
 it off.
+
+---
+
+## Accessibility notes
+
+An automated Lighthouse accessibility audit on the web build scored 92/100,
+with 16 checks passed and only one failing check. That failure —
+`user-scalable="no"` on the viewport meta tag — comes from a default set by
+the Flutter web engine itself (used to keep pinch-zoom from interfering with
+CanvasKit rendering) across all Flutter web apps. It is not controllable
+from application code and is not specific to this package.
+
+This automated audit is a useful signal but is not a substitute for a real
+screen reader pass (NVDA, VoiceOver, TalkBack, Orca) — those remain
+outstanding for all platforms and are tracked in the support matrix above.

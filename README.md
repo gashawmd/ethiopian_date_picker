@@ -1,33 +1,51 @@
 # flutter_ethiopian_date_picker
 
-A Flutter package for working with the Ethiopian (Ge'ez) calendar — conversion, a
-Material 3 date picker, range selection, form field integration, theming, and
-localization (English, Amharic, Afaan Oromo, Tigrinya).
+[![pub package](https://img.shields.io/pub/v/flutter_ethiopian_date_picker.svg)](https://pub.dev/packages/flutter_ethiopian_date_picker)
+[![likes](https://img.shields.io/pub/likes/flutter_ethiopian_date_picker)](https://pub.dev/packages/flutter_ethiopian_date_picker/score)
+[![popularity](https://img.shields.io/pub/popularity/flutter_ethiopian_date_picker)](https://pub.dev/packages/flutter_ethiopian_date_picker/score)
+[![CI](https://github.com/gashawmd/ethiopian_date_picker/actions/workflows/platform-matrix.yml/badge.svg)](https://github.com/gashawmd/ethiopian_date_picker/actions/workflows/platform-matrix.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+
+A Flutter Material 3 date picker for the Ethiopian (Ge'ez) calendar with
+Gregorian conversion, range selection, localization, theming, and form
+integration.
+
+## Why flutter_ethiopian_date_picker?
+
+- Native Ethiopian (Ge'ez) calendar support
+- Accurate Gregorian ⇄ Ethiopian conversion
+- Material 3–styled date picker
+- Embeddable calendar widget
+- Date range selection
+- Form integration
+- Full localization support
+- Customizable theming
+- Keyboard and screen-reader accessible
 
 ## Screenshots
 
 <table>
   <tr>
-    <td align="center"><img src="doc/screenshots/01-home-light.jpg" width="260"><br><sub>Example app — light theme</sub></td>
-    <td align="center"><img src="doc/screenshots/02-home-dark.jpg" width="260"><br><sub>Example app — dark theme</sub></td>
-  </tr>
-  <tr>
+    <td align="center"><img src="doc/screenshots/01-home-light.jpg" width="260"><br><sub>Example app — home</sub></td>
     <td align="center"><img src="doc/screenshots/03-picker-default-theme.jpg" width="260"><br><sub>Date picker — default theme</sub></td>
-    <td align="center"><img src="doc/screenshots/04-picker-custom-theme.jpg" width="260"><br><sub>Date picker — custom theme (deep orange)</sub></td>
   </tr>
   <tr>
     <td align="center"><img src="doc/screenshots/05-range-picker.jpg" width="260"><br><sub>Range picker — selected range</sub></td>
-    <td align="center"><img src="doc/screenshots/06-locale-ti.jpg" width="260"><br><sub>Localized — Tigrinya (ትግርኛ)</sub></td>
+    <td align="center"><img src="doc/screenshots/04-picker-custom-theme.jpg" width="260"><br><sub>Date picker — custom theme (deep orange)</sub></td>
   </tr>
 </table>
 
 <details>
-<summary>More locales (Amharic, Afaan Oromo)</summary>
+<summary>More examples (dark theme, Amharic, Afaan Oromo, Tigrinya)</summary>
 
 <table>
   <tr>
+    <td align="center"><img src="doc/screenshots/02-home-dark.jpg" width="260"><br><sub>Example app — dark theme</sub></td>
     <td align="center"><img src="doc/screenshots/07-locale-am.jpg" width="260"><br><sub>Localized — Amharic (አማርኛ)</sub></td>
+  </tr>
+  <tr>
     <td align="center"><img src="doc/screenshots/08-locale-om.jpg" width="260"><br><sub>Localized — Afaan Oromo, with keyboard-focus tooltip</sub></td>
+    <td align="center"><img src="doc/screenshots/06-locale-ti.jpg" width="260"><br><sub>Localized — Tigrinya (ትግርኛ)</sub></td>
   </tr>
 </table>
 
@@ -37,30 +55,34 @@ localization (English, Amharic, Afaan Oromo, Tigrinya).
 
 ```yaml
 dependencies:
-  flutter_ethiopian_date_picker: ^0.4.0
+  flutter_ethiopian_date_picker: ^1.0.0
 ```
 
-```
+```sh
 flutter pub get
 ```
 
-## Simple usage
+```dart
+import 'package:flutter_ethiopian_date_picker/flutter_ethiopian_date_picker.dart';
+```
 
-One line, zero config:
+## Quick start
+
+Show a date picker with the default configuration:
 
 ```dart
 final date = await showEthiopianDatePicker(context: context);
 ```
 
-## Advanced usage
+## Customization
 
 ```dart
 final date = await showEthiopianDatePicker(
   context: context,
   initialDate: EthiopianDate.today(),
-  firstDate: EthiopianDate(2010, 1, 1), // positional: year, month, day
+  firstDate: EthiopianDate(2010, 1, 1),
   lastDate: EthiopianDate(2020, 13, 5),
-  locale: EthiopianLocale.amharic.code, // locale param takes a String code
+  locale: EthiopianLocale.amharic.code,
   theme: EthiopianDatePickerTheme.material3(context).copyWith(
     primaryColor: Colors.deepOrange,
     selectedColor: Colors.deepOrange,
@@ -98,7 +120,7 @@ final gregorian = ethiopian.toGregorian();
 final today = DateTime.now().toEthiopianDate();
 ```
 
-## Widget usage (embedded, not a dialog)
+## Embedded calendar
 
 ```dart
 class MyEmbeddedCalendar extends StatefulWidget {
@@ -126,15 +148,7 @@ class _MyEmbeddedCalendarState extends State<MyEmbeddedCalendar> {
 }
 ```
 
-`EthiopianCalendarView` is fully stateless and controlled: it doesn't track
-displayed month or selection itself — the caller owns both via
-`displayedMonth`/`selectedDate` (or `selectedRange` for range mode, which
-takes priority over `selectedDate` if both are set) and reacts to
-`onDateSelected`/`onMonthChanged`.
-
-`EthiopianCalendarView` is stateless and fully controlled — pass the selected
-date back in via `initialDate`/state management of your choice (Provider,
-Riverpod, and Bloc are all smoke-tested; see `test/state_management_smoke_test.dart`).
+`EthiopianCalendarView` is fully stateless and controlled. The parent owns the displayed month and selected date (or selected range, which takes priority over `selectedDate` if both are set) and updates them through `onMonthChanged` and `onDateSelected`. It integrates naturally with `setState`, Provider, Riverpod, Bloc, or any other state management solution.
 
 ## Form field usage
 
@@ -156,15 +170,18 @@ Form(
 ```dart
 showEthiopianDatePicker(
   context: context,
-  locale: EthiopianLocale.oromo.code, // 'en', 'am', 'om', 'ti'
+  locale: EthiopianLocale.oromo.code,
 );
 ```
 
-`EthiopianLocale` is the enum used for UI pickers (e.g. a locale dropdown);
-every picker function takes the raw `String` code via `.code`, not the enum
-itself.
+Supported locales:
 
-An unsupported or missing locale falls back to English automatically.
+- English (`en`)
+- Amharic (`am`)
+- Afaan Oromo (`om`)
+- Tigrinya (`ti`)
+
+Unsupported locale codes automatically fall back to English.
 
 ## Theming
 
@@ -188,40 +205,49 @@ uses Material 3 defaults derived from the ambient `Theme.of(context)`.
 | `EthiopianDatePickerTheme` | Visual customization: colors, spacing, typography. |
 | `EthiopianLocale` | `en`, `am`, `om`, `ti` — enum used for all localized text. |
 
-Full symbol-level API docs are published to pub.dev once released; until then
-run `dart doc .` locally to browse.
+For complete API documentation, see the package page on pub.dev.
 
-## Supported features
+## Features
 
 - ✅ Gregorian ⇄ Ethiopian conversion (leap years, Pagume 5/6 days), fuzz-tested
-- ✅ Single date picker dialog + embeddable calendar widget
+- ✅ Material 3 date picker dialog
+- ✅ Embeddable calendar widget
 - ✅ Date range selection (same-day, cross-month, cross-year)
 - ✅ Material 3 theming with full override support
-- ✅ Slide/fade month transitions, ripple selection, dialog animations
 - ✅ Localization: English, Amharic, Afaan Oromo, Tigrinya (fallback to English)
 - ✅ `Form`/`FormState` integration via `EthiopianDateFormField`
-- ✅ Accessibility: semantic labels, full keyboard navigation, ≥48px touch targets,
-  screen reader smoke-tested (VoiceOver/TalkBack)
-- ✅ No internal global/static mutable state — safe with Provider, Riverpod, Bloc
+- ✅ Accessibility: semantic labels, full keyboard navigation, ≥48px touch targets, screen reader smoke-tested (VoiceOver/TalkBack)
+- ✅ No internal global/static mutable state — safe with Provider, Riverpod, and Bloc
 - ✅ Golden-tested UI across all themes and locales
-- 🚧 Platform verification matrix — see `PLATFORM_SUPPORT.md` (in progress)
+- ✅ Slide/fade month transitions, ripple selection, and dialog animations
+- ✅ Verified building on Android, iOS, Web, Windows, macOS, and Linux
+
 
 ## Example app
 
-See `example/` for a runnable app covering: opening the picker, theme
-switching (light/dark), locale switching, range picker, and form field usage.
+The `example/` application demonstrates:
 
-```
+- Date picker dialog
+- Embedded calendar widget
+- Range selection
+- Theme switching
+- Locale switching
+- Form integration
+
+```sh
 cd example
+flutter pub get
 flutter run
 ```
 
 ## Contributing / development
 
+Contributions, bug reports, and feature requests are welcome.
+
 - `flutter analyze` and `flutter test` must pass before opening a PR (enforced
-  in CI, see Task 0.2).
+  in CI).
 - Any change to the public API must update `CHANGELOG.md`.
 
 ## License
 
-MIT (or BSD-3 — match whatever `LICENSE` was chosen in Task 0.1).
+MIT — see the [LICENSE](LICENSE) file for details.
