@@ -1,19 +1,38 @@
-.dart_tool/
-.packages
-build/
-pubspec.lock
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IntelliJ related
 *.iml
+*.ipr
+*.iws
 .idea/
-.vscode/
-coverage/
-test_output.log
-test_results.json
-analyze_output.txt
-analyze_output.json
-dialog_test_results.json
-error_handling_results.json
-widget_test_results.json
-all_test_results.json
-analyze_output.log
-/tmp/test_run_*.log
-example/build/
+
+# Flutter/Dart/Pub related
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.dart_tool/
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/build/
+/coverage/
+
+# Symbolication / Obfuscation
+app.*.symbols
+app.*.map.json
+
+# Android Studio
+/android/app/debug
+/android/app/profile
+/android/app/release

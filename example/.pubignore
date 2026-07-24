@@ -1,0 +1,12 @@
+.dart_tool/
+.build/
+build/
+*.lock
+example/ios/
+example/android/
+example/macos/
+example/web/
+example/windows/
+example/linux/
+example/.dart_tool/
+example/build/

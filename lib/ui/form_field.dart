@@ -5,7 +5,16 @@ import '../core/ethiopian_date_interop.dart';
 import '../theme/picker_theme.dart';
 import 'date_picker_dialog.dart';
 
+/// A controller for [EthiopianDateFormField] that keeps a typed-text
+/// representation in sync with an [EthiopianDate] value.
+///
+/// Use this when you want typed-entry mode (a plain text field the
+/// user can type a date into) instead of the default tap-to-open
+/// picker mode. Listen via [addListener] (inherited from
+/// [ValueNotifier]) to react to value changes, and dispose it when
+/// no longer needed.
 class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
+  /// Creates a controller, optionally pre-filled with [initialValue].
   EthiopianDateEditingController({EthiopianDate? initialValue})
       : _textController = TextEditingController(
           text: initialValue?.format() ?? '',
@@ -15,8 +24,15 @@ class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
   }
 
   final TextEditingController _textController;
+
+  /// The underlying TextEditingController backing the text field,
+  /// exposed for advanced customization (e.g. cursor/selection control).
   TextEditingController get textController => _textController;
+
+  /// The current raw text in the field.
   String get text => _textController.text;
+
+  /// Sets the field's raw text directly.
   set text(String newText) => _textController.text = newText;
 
   bool _syncingFromValue = false;
@@ -60,7 +76,16 @@ class EthiopianDateEditingController extends ValueNotifier<EthiopianDate?> {
   }
 }
 
+/// A FormField wrapper around the Ethiopian date picker, for use
+/// inside a standard Form.
+///
+/// By default, tapping the field opens [showEthiopianDatePicker]. Pass
+/// a [controller] to switch to typed-entry mode instead. Works with
+/// FormState.validate and FormState.save like any other FormField.
 class EthiopianDateFormField extends FormField<EthiopianDate> {
+  /// Creates a form field. Provide either [initialValue] or
+  /// [controller], not both - a [controller] already owns the initial
+  /// value.
   EthiopianDateFormField({
     super.key,
     EthiopianDate? initialValue,
@@ -89,12 +114,26 @@ class EthiopianDateFormField extends FormField<EthiopianDate> {
           },
         );
 
+  /// The earliest selectable date, if bounded.
   final EthiopianDate? firstDate;
+
+  /// The latest selectable date, if bounded.
   final EthiopianDate? lastDate;
+
+  /// Locale code for the picker dialog's UI text.
   final String? locale;
+
+  /// Optional visual theme for the picker dialog.
   final EthiopianDatePickerTheme? theme;
+
+  /// Decoration applied to the underlying input, e.g. label and hint.
   final InputDecoration decoration;
+
+  /// Switches the field to typed-entry mode when provided, instead of
+  /// the default tap-to-open picker.
   final EthiopianDateEditingController? controller;
+
+  /// Called whenever the field's value changes, from either mode.
   final ValueChanged<EthiopianDate?>? onChanged;
 }
 

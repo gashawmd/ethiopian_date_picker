@@ -1,5 +1,6 @@
 import 'ethiopian_locale.dart';
 
+/// Tigrinya ('ti') localization data for Ethiopian calendar labels and month names.
 final EthiopianLocaleData tiLocaleData = EthiopianLocaleData(
   languageCode: 'ti',
   monthNames: [

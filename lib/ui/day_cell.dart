@@ -4,7 +4,14 @@ import '../theme/picker_theme.dart';
 
 const double _kMinTapTarget = 48.0;
 
+/// A single tappable day cell in an [EthiopianCalendarView] grid.
+///
+/// Renders as a circular tap target at least 48px in size, with
+/// visual states for selected, today, disabled, and range
+/// start/end/middle. Most users won't construct this directly — it's
+/// built internally by [EthiopianCalendarView].
 class EthiopianDayCell extends StatefulWidget {
+  /// Creates a day cell for the given [day] number and visual state.
   const EthiopianDayCell({
     super.key,
     required this.day,
@@ -20,19 +27,40 @@ class EthiopianDayCell extends StatefulWidget {
     this.autofocus = false,
   });
 
+  /// The day-of-month number displayed in the cell.
   final int day;
+
+  /// Whether this cell represents the single currently-selected date.
   final bool isSelected;
+
+  /// Whether this cell represents today's date.
   final bool isToday;
+
+  /// Whether this cell falls outside the selectable range and cannot
+  /// be tapped.
   final bool isDisabled;
+
+  /// Called when the cell is tapped, unless [isDisabled] is true.
   final VoidCallback? onTap;
+
+  /// The spoken accessibility label announced by screen readers.
   final String semanticLabel;
 
   /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when unset.
   final EthiopianDatePickerTheme? theme;
 
+  /// Whether this cell is the first day of a selected range.
   final bool isRangeStart;
+
+  /// Whether this cell is the last day of a selected range.
   final bool isRangeEnd;
+
+  /// Whether this cell falls within (but is not the endpoint of) a
+  /// selected range.
   final bool isInRange;
+
+  /// Whether this cell should request focus automatically when built.
   final bool autofocus;
 
   @override

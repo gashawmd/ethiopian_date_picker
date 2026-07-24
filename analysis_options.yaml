@@ -19,3 +19,4 @@ linter:
     - prefer_final_locals
     - unawaited_futures
     - use_key_in_widget_constructors
+    - public_member_api_docs

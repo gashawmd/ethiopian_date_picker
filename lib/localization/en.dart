@@ -1,5 +1,6 @@
 import 'ethiopian_locale.dart';
 
+/// English ('en') localization data for Ethiopian calendar labels and month names.
 final EthiopianLocaleData enLocaleData = EthiopianLocaleData(
   languageCode: 'en',
   monthNames: [

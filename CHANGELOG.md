@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [1.0.1] - 2026-07-24
+
+### Fixed
+- Updated package metadata, fixed minor documentation typos, and aligned version references across the project.
+
 ## [1.0.0] - 2026-07-23
 
 ### Added
@@ -79,5 +84,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Error handling: clamping to `firstDate`/`lastDate`, debug assertions for
   invalid config, safe locale fallback.
 
-[Unreleased]: https://github.com/gashawmd/ethiopian_date_picker/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/gashawmd/ethiopian_date_picker/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/gashawmd/ethiopian_date_picker/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/gashawmd/ethiopian_date_picker/releases/tag/v1.0.0

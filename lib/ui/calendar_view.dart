@@ -8,7 +8,18 @@ import '../utils/date_utils.dart';
 import 'day_cell.dart';
 import 'header.dart';
 
+/// An embeddable, stateless Ethiopian calendar grid widget.
+///
+/// Unlike [showEthiopianDatePicker], this renders inline rather than
+/// as a dialog. It is fully controlled: the caller owns [displayedMonth]
+/// and [selectedDate] (or [selectedRange], which takes priority over
+/// [selectedDate] if both are set) and updates them in response to
+/// [onDateSelected] and [onMonthChanged]. This makes it easy to drive
+/// with `setState`, Provider, Riverpod, Bloc, or any other state
+/// management approach.
 class EthiopianCalendarView extends StatelessWidget {
+  /// Creates a calendar view for [displayedMonth], bounded by
+  /// [firstDate] and [lastDate].
   const EthiopianCalendarView({
     super.key,
     required this.displayedMonth,
@@ -22,16 +33,38 @@ class EthiopianCalendarView extends StatelessWidget {
     this.theme,
   });
 
+  /// The month currently shown. Only [displayedMonth]'s year/month are
+  /// used; its day is ignored.
   final EthiopianDate displayedMonth;
+
+  /// The earliest selectable date. Dates before this are disabled.
   final EthiopianDate firstDate;
+
+  /// The latest selectable date. Dates after this are disabled.
   final EthiopianDate lastDate;
+
+  /// The currently selected single date, if any. Ignored when
+  /// [selectedRange] is also set.
   final EthiopianDate? selectedDate;
+
+  /// The currently selected date range, if any. Takes priority over
+  /// [selectedDate] when both are provided.
   final EthiopianDateRange? selectedRange;
+
+  /// Called when the user taps a selectable day cell.
   final ValueChanged<EthiopianDate> onDateSelected;
+
+  /// Called when the user navigates to a different month via the
+  /// header's previous/next controls.
   final ValueChanged<EthiopianDate> onMonthChanged;
+
+  /// Locale code (`'en'`, `'am'`, `'om'`, `'ti'`) for month/weekday
+  /// names and labels. Falls back to English if unset or unsupported.
   final String? locale;
 
   /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] derived from the ambient
+  /// [Theme] when unset.
   final EthiopianDatePickerTheme? theme;
   static const double _width = 364;
   static const Duration _monthTransitionDuration = Duration(milliseconds: 220);

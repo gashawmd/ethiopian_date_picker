@@ -7,6 +7,17 @@ import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
 
+/// Shows the Ethiopian date picker as a modal dialog and returns the
+/// date the user selected, or `null` if they cancelled.
+///
+/// - [initialDate] is the date shown/selected when the dialog opens;
+///   defaults to [EthiopianDate.today].
+/// - [firstDate] and [lastDate] bound the selectable range; default to
+///   a wide span (1900-2100).
+/// - [locale] selects UI language (`'en'`, `'am'`, `'om'`, `'ti'`);
+///   unsupported or missing codes fall back to English.
+/// - [theme] overrides colors, spacing, and typography; defaults to
+///   [EthiopianDatePickerTheme.material3].
 Future<EthiopianDate?> showEthiopianDatePicker({
   required BuildContext context,
   EthiopianDate? initialDate,
@@ -56,7 +67,13 @@ Future<EthiopianDate?> showEthiopianDatePicker({
   );
 }
 
+/// The dialog widget rendered by [showEthiopianDatePicker].
+///
+/// Most users should call [showEthiopianDatePicker] directly rather
+/// than constructing this widget themselves.
 class EthiopianDatePickerDialog extends StatefulWidget {
+  /// Creates the picker dialog. Throws an assertion error in debug
+  /// mode if [firstDate] is after [lastDate].
   EthiopianDatePickerDialog({
     super.key,
     required this.initialDate,
@@ -70,14 +87,21 @@ class EthiopianDatePickerDialog extends StatefulWidget {
           'after lastDate ($lastDate).',
         );
 
+  /// The date shown/selected when the dialog first opens.
   final EthiopianDate initialDate;
+
+  /// The earliest selectable date.
   final EthiopianDate firstDate;
+
+  /// The latest selectable date.
   final EthiopianDate lastDate;
 
-  /// it just falls back to English.
+  /// Locale code for UI text. If unset or unsupported, it just falls
+  /// back to English.
   final String? locale;
 
   /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when unset.
   final EthiopianDatePickerTheme? theme;
 
   @override

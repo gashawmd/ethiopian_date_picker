@@ -1,5 +1,6 @@
 import 'ethiopian_locale.dart';
 
+/// Amharic ('am') localization data for Ethiopian calendar labels and month names.
 final EthiopianLocaleData amLocaleData = EthiopianLocaleData(
   languageCode: 'am',
   monthNames: [

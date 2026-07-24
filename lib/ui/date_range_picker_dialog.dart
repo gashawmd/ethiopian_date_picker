@@ -9,6 +9,17 @@ import '../theme/picker_theme.dart';
 import '../utils/date_utils.dart';
 import 'calendar_view.dart';
 
+/// Shows the Ethiopian date-range picker as a modal dialog and
+/// returns the range the user selected, or `null` if they cancelled.
+///
+/// - [initialRange] pre-fills a start/end selection when the dialog
+///   opens; leave unset to start with no selection.
+/// - [firstDate] and [lastDate] bound the selectable range; default to
+///   a wide span (1900-2100).
+/// - [locale] selects UI language (`'en'`, `'am'`, `'om'`, `'ti'`);
+///   unsupported or missing codes fall back to English.
+/// - [theme] overrides colors, spacing, and typography; defaults to
+///   [EthiopianDatePickerTheme.material3].
 Future<EthiopianDateRange?> showEthiopianDateRangePicker({
   required BuildContext context,
   EthiopianDateRange? initialRange,
@@ -56,7 +67,13 @@ Future<EthiopianDateRange?> showEthiopianDateRangePicker({
   );
 }
 
+/// The dialog widget rendered by [showEthiopianDateRangePicker].
+///
+/// Most users should call [showEthiopianDateRangePicker] directly
+/// rather than constructing this widget themselves.
 class EthiopianDateRangePickerDialog extends StatefulWidget {
+  /// Creates the range picker dialog. Throws an assertion error in
+  /// debug mode if [firstDate] is after [lastDate].
   EthiopianDateRangePickerDialog({
     super.key,
     this.initialRange,
@@ -70,13 +87,21 @@ class EthiopianDateRangePickerDialog extends StatefulWidget {
           'be after lastDate ($lastDate).',
         );
 
+  /// A pre-filled start/end selection shown when the dialog opens.
   final EthiopianDateRange? initialRange;
 
+  /// The earliest selectable date.
   final EthiopianDate firstDate;
+
+  /// The latest selectable date.
   final EthiopianDate lastDate;
+
+  /// Locale code for UI text. Falls back to English if unset or
+  /// unsupported.
   final String? locale;
 
   /// Optional visual theme. Falls back to
+  /// [EthiopianDatePickerTheme.material3] when unset.
   final EthiopianDatePickerTheme? theme;
 
   @override

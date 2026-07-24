@@ -1,6 +1,6 @@
 name: flutter_ethiopian_date_picker
 description: A customizable Ethiopian (Ge'ez) calendar date picker widget for Flutter.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/gashawmd/ethiopian_date_picker
 repository: https://github.com/gashawmd/ethiopian_date_picker
 license: MIT
@@ -17,13 +17,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   # Task 6.1 — state management smoke tests only. None of these are
   # runtime dependencies of the package itself.
   provider: ^6.1.2
-  flutter_riverpod: ^2.5.1
-  flutter_bloc: ^8.1.6
-  bloc: ^8.1.4
+  flutter_riverpod: ^2.6.1
+  flutter_bloc: ^9.1.1
+  bloc: ^9.1.1
   # Task 6.2 — golden/screenshot tests.
   golden_toolkit: ^0.15.0
 

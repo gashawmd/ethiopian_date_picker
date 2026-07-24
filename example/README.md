@@ -1,17 +1,18 @@
 # flutter_ethiopian_date_picker_example
 
-A new Flutter project.
+An example application demonstrating how to use the `flutter_ethiopian_date_picker` package.
 
-## Getting Started
+## Features Demonstrated
 
-This project is a starting point for a Flutter application.
+- Date picker dialog (`showEthiopianDatePicker`)
+- Date range picker dialog (`showEthiopianDateRangePicker`)
+- Embedded calendar widget (`EthiopianCalendarView`)
+- Form integration (`EthiopianDateFormField`)
+- Custom Material 3 themes and light/dark mode switching
+- Localization (`en`, `am`, `om`, `ti`)
 
-A few resources to get you started if this is your first Flutter project:
+## Running the Example
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```sh
+flutter pub get
+flutter run

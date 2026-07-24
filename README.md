@@ -2,13 +2,11 @@
 
 [![pub package](https://img.shields.io/pub/v/flutter_ethiopian_date_picker.svg)](https://pub.dev/packages/flutter_ethiopian_date_picker)
 [![likes](https://img.shields.io/pub/likes/flutter_ethiopian_date_picker)](https://pub.dev/packages/flutter_ethiopian_date_picker/score)
-[![popularity](https://img.shields.io/pub/popularity/flutter_ethiopian_date_picker)](https://pub.dev/packages/flutter_ethiopian_date_picker/score)
+[![pub points](https://img.shields.io/pub/points/flutter_ethiopian_date_picker)](https://pub.dev/packages/flutter_ethiopian_date_picker/score)
 [![CI](https://github.com/gashawmd/ethiopian_date_picker/actions/workflows/platform-matrix.yml/badge.svg)](https://github.com/gashawmd/ethiopian_date_picker/actions/workflows/platform-matrix.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-A Flutter Material 3 date picker for the Ethiopian (Ge'ez) calendar with
-Gregorian conversion, range selection, localization, theming, and form
-integration.
+A customizable Material 3 Ethiopian (Ge'ez) date picker for Flutter with accurate Gregorian conversion, date-range selection, localization, theming, and seamless form integration.
 
 ## Why flutter_ethiopian_date_picker?
 
@@ -55,7 +53,7 @@ integration.
 
 ```yaml
 dependencies:
-  flutter_ethiopian_date_picker: ^1.0.0
+  flutter_ethiopian_date_picker: ^1.0.1
 ```
 
 ```sh

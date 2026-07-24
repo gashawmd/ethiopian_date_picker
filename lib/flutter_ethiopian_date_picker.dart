@@ -1,6 +1,6 @@
 /// Ethiopian (Ge'ez) calendar support for Dart & Flutter: an immutable
 /// date model, exact Gregorian conversion, date arithmetic, and  a Material date picker widget.
-library flutter_ethiopian_date_picker;
+library;
 
 export 'core/ethiopian_date.dart';
 export 'core/ethiopian_date_arithmetic.dart';
